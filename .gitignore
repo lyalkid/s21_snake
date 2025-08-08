@@ -19,6 +19,18 @@ build/
 *.gch
 *.pch
 
+
+misc/
+materials/
+data-samples/
+datasets/
+code-samples/
+ACTIVE_TAG_FILES.txt
+CHANGELOG
+LICENSE
+*.md
+
+
 # Libraries
 *.lib
 *.a
