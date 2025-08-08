@@ -10,16 +10,22 @@
 int main(){
     init_nc();
     // init ncurses
-    View views = init_view();
+    Tetris_wins_t views = init_view();
 
     init_view(views);
     int ch;
     int tick = 0;           // Счётчик времени
     int delay_ms = 500;     // Скорость падения фигуры (500 мс)
     int running = 1;
+    // set_tetris_wins(&views);
+    int play = menu();
+
+
     while(running){
 
-        set_view(&views);
+        // render main win
+        // choose game
+        // initialize game or quite
         ch = getch();
         running = 0;
     }

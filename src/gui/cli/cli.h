@@ -7,7 +7,9 @@
 #define CLI_H
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <ncurses.h>
+#define ITEMS 4
 #define HEIGHT 20
 #define WIDTH 10
 #define scale_field 2
@@ -25,15 +27,23 @@
 #define NEXT_X NEXT_FIELD* scale + 2
 #define NEXT_Y NEXT_FIELD
 
+
+#define CONTROL_UP 'w'
+#define CONTROL_DOWN 's'
+#define CONTROL_NEXT '\n' // Enter
 typedef struct {
     int yMax;
     int xMax;
-#ifndef debug
     WINDOW* game_win;
     WINDOW* info_win;
     WINDOW* next_win;
-    #endif
-} View;
+} Tetris_wins_t;
+
+typedef struct {
+    WINDOW* title_win;
+    WINDOW* menu_win;
+    WINDOW* info_win;
+}Game_wins_t;
 
 /*!
     \brief Родительский класс, не несущий никакой смысловой нагрузки
@@ -42,9 +52,13 @@ typedef struct {
     как Doxygen документирует наследование
 */
 void init_nc();
-void set_view(View* views);
-View init_view();
+void set_tetris_wins(Tetris_wins_t* views);
+Tetris_wins_t init_view();
 void init_colors();
-void terminate_ncurses(View* views);
+void terminate_ncurses(Tetris_wins_t* views);
+
+int menu() ;
+void print_menu(WINDOW *menu_win, int highlight, const char **choices);
+Game_wins_t* get_game_wins() ;
 
 #endif //CLI_H
