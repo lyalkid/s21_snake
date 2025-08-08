@@ -1,0 +1,31 @@
+//
+// Created by Azamat G. on 08.08.2025.
+//
+
+#ifndef GAME_API_H
+#define GAME_API_H
+
+
+
+typedef enum {
+    Start,
+    Pause,
+    Terminate,
+    Left,
+    Right,
+    Up,
+    Down,
+    Action,
+  } UserAction_t;
+
+typedef struct {
+    int score;
+    int high_score;
+    int level;
+    int speed;
+    int pause;
+    int** field;
+    int** next;
+} GameInfo_t;
+
+#endif //GAME_API_H
