@@ -8,12 +8,8 @@ add_executable(tetris
         main_cli.c
         gui/cli/cli.c
         gui/cli/cli.h
-        #        src/brick_game/tetris/tetris_bro.c
-#        src/brick_game/tetris/src/backend.c
-##        src/brick_game/tetris/src/fsm.c
-#        src/brick_game/tetris/tetris_bro.c
-##        src/brick_game/tetris/src/fsm.c
-#        src/brick_game/tetris/src/fsm_main.c
+        brick_game/tetris.c
+        brick_game/brick_game.h
 
 )
 target_link_libraries(tetris m ncurses)
