@@ -8,30 +8,24 @@
 #include <curses.h>
 
 #include "cli.h"
-Game_wins_t* get_game_wins() {
-  static Game_wins_t* game_wins;
-  if (game_wins == NULL) {
-    game_wins = malloc(sizeof(Game_wins_t));
-  }
-  return game_wins;
-}
 
 int menu() {
-  const char* list[ITEMS] = {"tetris", "snake", "cars", "exit"};
+  const char* list[ITEMS] = {"exit", "tetris", "snake", "cars"};
   char item[20];
   WINDOW* title_win = get_game_wins()->title_win;
   WINDOW* menu_win = get_game_wins()->menu_win;
   WINDOW* info_win = get_game_wins()->info_win;
-  title_win = newwin(3, 25, 1, 1);
-  menu_win = newwin(15, 25, 4, 1);
+
   keypad(menu_win, TRUE);
 
-  mvwprintw(title_win, 1, 8, "BRICKGAME");
+  set_title(title_win, "BRICKGAME");
   refresh();
   box(menu_win, 0, 0);
   box(title_win, 0, 0);
+  box(info_win, 0, 0);
   wrefresh(menu_win);
   wrefresh(title_win);
+  wrefresh(info_win);
   int highlight = 0;
   int choice = 0;
   int c = 0;
@@ -54,9 +48,8 @@ int menu() {
     if (c == CONTROL_NEXT) {
       break;
     }
-    // timeout(1000000);
   }
-  return 0;
+  return choice;
 }
 
 void print_menu(WINDOW* menu_win, int highlight, const char** choices) {
@@ -74,4 +67,8 @@ void print_menu(WINDOW* menu_win, int highlight, const char** choices) {
     y++;
   }
   wrefresh(menu_win);
+}
+
+void set_title(WINDOW* title_win, char* title) {
+  mvwprintw(title_win, 1, 8, "%s", title);
 }

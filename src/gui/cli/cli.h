@@ -53,12 +53,15 @@ typedef struct {
 */
 void init_nc();
 void set_tetris_wins(Tetris_wins_t* views);
-Tetris_wins_t init_view();
 void init_colors();
-void terminate_ncurses(Tetris_wins_t* views);
+void terminate_ncurses();
 
 int menu() ;
 void print_menu(WINDOW *menu_win, int highlight, const char **choices);
+void set_title(WINDOW* title_win, char* title);
 Game_wins_t* get_game_wins() ;
+void cleanup_game_wins(Game_wins_t* game_wins);
+Tetris_wins_t init_tetris_wins();
+Tetris_wins_t* get_tetris_wins();
 
 #endif //CLI_H

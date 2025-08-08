@@ -11,6 +11,7 @@ add_executable(tetris
         brick_game/brick_game.h
         brick_game/tetris_engine.c
         brick_game/tetris_engine.h
+        gui/cli/menu.c
 
 )
 target_link_libraries(tetris m ncurses)

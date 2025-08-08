@@ -5,11 +5,11 @@ CFLAGS = -c
 LDFLAGS = -Wall -Werror -Wextra -std=c11
 
 
-CORE_TETRIS_DIR = brick_game/tetris
-CORE_SNAKE_DIR = brick_game/snake
+CORE_TETRIS_DIR = brick_game
+#CORE_SNAKE_DIR = brick_game
 GUI_CLI_DIR = gui/cli
 GUI_DESKTOP_DIR = gui/desktop
-SRC_DIR = ../
+SRC_DIR = .
 UTILS_DIR = utils 
 BIN_DIR = bin
 GCOV_DIR = gcov_report
@@ -17,10 +17,10 @@ OBJ_DIR = obj
 DOCS_DIR = docs
 
 TETRIS_SRC = $(wildcard $(CORE_TETRIS_DIR)/*.c )
-SNAKE_SRC = $(wildcard $(CORE_SNAKE_DIR)/*.c )
+#SNAKE_SRC = $(wildcard $(CORE_SNAKE_DIR)/*.c )
 CLI_SRC = $(wildcard $(GUI_CLI_DIR)/*.c)
 UTILS_SRC = $(wildcard utils/*.c)
-MAIN_SRC = $(wildcard $(SRC_DIR)/*.c)
+MAIN_SRC = $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/*.cpp )
 
 UNAME_S := Linux
 ifeq ($(UNAME_S),Linux)
@@ -45,17 +45,17 @@ dvi:
 	doxygen Doxyfile
 
 style:
-	clang-format --style=Google -i $(TETRIS_SRC) $(MAIN_SRC) $(SNAKE_SRC) $(CLI_SRC) $(UTILS_SRC)
+	clang-format --style=Google -i $(TETRIS_SRC) $(MAIN_SRC)  $(CLI_SRC) $(UTILS_SRC)
 
 style_test:
-	clang-format --style=Google -n $(TETRIS_SRC) $(MAIN_SRC) $(SNAKE_SRC) $(CLI_SRC) $(UTILS_SRC)
+	clang-format --style=Google -n $(TETRIS_SRC) $(MAIN_SRC)  $(CLI_SRC) $(UTILS_SRC)
 
 create_file:
 	test -f highscore.txt || ( touch highscore.txt && echo 0 >> highscore.txt )
 
 cli: create_file 
 	mkdir $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(ADD_LIB) main_cli.c $(TETRIS_SRC) $(SNAKE_SRC) $(CLI_SRC) $(UTILS_SRC)
+	$(CC) $(CFLAGS) $(ADD_LIB) main_cli.c $(TETRIS_SRC) $(CLI_SRC) $(UTILS_SRC)
 	mv *.o $(OBJ_DIR)
 
 run_cli:install
