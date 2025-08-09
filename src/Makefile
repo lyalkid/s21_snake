@@ -1,7 +1,6 @@
 CC = gcc
 CP = g++
-CFLAGS = -c
-#-Wall -Werror -Wextra -std=c11
+CFLAGS = -c -Wall -Werror -Wextra -std=c11
 LDFLAGS = -Wall -Werror -Wextra -std=c11
 
 

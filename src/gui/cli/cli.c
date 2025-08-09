@@ -9,7 +9,7 @@ void init_nc() {
   initscr();
   cbreak();
   noecho();
-  int h = 0, w = 0;
+  //  int h = 0, w = 0;
 
   init_colors();
 

@@ -11,7 +11,7 @@
 
 int menu() {
   const char* list[ITEMS] = {"exit", "tetris", "snake", "cars"};
-  char item[20];
+
   WINDOW* title_win = get_game_wins()->title_win;
   WINDOW* menu_win = get_game_wins()->menu_win;
   WINDOW* info_win = get_game_wins()->info_win;
