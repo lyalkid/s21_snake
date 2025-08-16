@@ -4,20 +4,20 @@ WFLAGS = -Wall -Werror -Wextra
 CFLAGS = -c -std=c11 #$(WFLAGS)
 LDFLAGS = -std=c11 #$(WFLAGS)
 
-
-CORE_TETRIS_DIR = brick_game
-#CORE_SNAKE_DIR = brick_game
+BRICK_GAME = brick_game
+CORE_TETRIS_DIR = brick_game/tetris/tetris_engine
 GUI_CLI_DIR = gui/cli
-GUI_DESKTOP_DIR = gui/desktop
-GUI_STDIO_DIR = gui/stdio
+
+
 SRC_DIR = .
-UTILS_DIR = utils 
+ 
 BIN_DIR = bin
 GCOV_DIR = gcov_report
 OBJ_DIR = obj
 DOCS_DIR = docs
 
-TETRIS_SRC = $(wildcard $(CORE_TETRIS_DIR)/*.c $(CORE_TETRIS_DIR)/*/*/*.c )
+HEADERS = $(wildcard $(CORE_TETRIS_DIR)/inc/*.h $(CORE_TETRIS_DIR)/*.h $(BRICK_GAME)/*.h )
+TETRIS_SRC = $(wildcard  $(CORE_TETRIS_DIR)/src/*.c )
 #SNAKE_SRC = $(wildcard $(CORE_SNAKE_DIR)/*.c )
 CLI_SRC = $(wildcard $(GUI_CLI_DIR)/*.c $(GUI_CLI_DIR)/*/*.c)
 MAIN_SRC = $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/*.cpp )
@@ -45,17 +45,17 @@ dvi:
 	doxygen Doxyfile
 
 style:
-	@clang-format --style=Google -i $(TETRIS_SRC) $(MAIN_SRC)  $(CLI_SRC)
+	@clang-format --style=Google -i $(TETRIS_SRC) $(MAIN_SRC)  $(CLI_SRC) $(HEADERS)
 
 style_test:
-	@clang-format --style=Google -n $(TETRIS_SRC) $(MAIN_SRC)  $(CLI_SRC)
+	@clang-format --style=Google -n $(TETRIS_SRC) $(MAIN_SRC)  $(CLI_SRC) $(HEADERS)
 
 create_file:
 	@test -f highscore.txt || ( touch highscore.txt && echo 0 >> highscore.txt )
 
 cli: create_file 
 	@mkdir $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(ADD_LIB) main_tetris.c $(TETRIS_SRC) $(CLI_SRC)
+	$(CC) $(CFLAGS) $(ADD_LIB) main_cli.c $(TETRIS_SRC) $(CLI_SRC)
 	@mv *.o $(OBJ_DIR)
 
 run_cli:clean install
@@ -63,4 +63,4 @@ run_cli:clean install
 
 
 clean:
-	rm -rf ./$(BIN_DIR) ./$(OBJ_DIR) *.out *.o *.log ./$(DOCS_DIR)
+	rm -rf ./$(BIN_DIR) ./$(OBJ_DIR) *.out *.o  ./$(DOCS_DIR)

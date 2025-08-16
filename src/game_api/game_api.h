@@ -5,32 +5,26 @@
 #ifndef GAME_API_H
 #define GAME_API_H
 #include <stdbool.h>
+#include <stdlib.h>
+#include "../brick_game/brick_game.h"
 
 
-typedef enum {
-    Start,
-    Pause,
-    Terminate,
-    Left,
-    Right,
-    Up,
-    Down,
-    Action,
-  } UserAction_t;
-
-typedef struct {
-    int score;
-    int high_score;
-    int level;
-    int speed;
-    int pause;
-    int** field;
-    int** next;
-} GameInfo_t;
 
 void userInput(UserAction_t action, bool hold);
 
 GameInfo_t updateCurrentState();
 
+void tetris_userInput(UserAction_t action, bool hold);
+
+GameInfo_t tetris_updateCurrentState();
+
+typedef enum { GAME_TETRIS, GAME_SNAKE } GameType;
+
+GameType *getCurrentGameType() {
+    static GameType *currentGame;
+    if (currentGame == NULL) { currentGame = (GameType *) malloc(sizeof(GameType)); }
+    return currentGame;
+}
+void selectGame( GameType game);
 
 #endif //GAME_API_H

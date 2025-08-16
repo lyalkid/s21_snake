@@ -4,23 +4,27 @@
 
 #ifndef BRICK_GAME_H
 #define BRICK_GAME_H
-/**
- * @mainpage BrickGame Project
- *
- * Добро пожаловать в документацию BrickGame!
- *
- * Здесь описывается архитектура, интерфейсы, используемые типы и т.п.
- *
- * ## Структура проекта
- * - brick_game — игровые модули
- * - gui — интерфейсы
- * - main_cli.c — точка входа для консоли
- * ...
- *
- * ## API
- * См. описание в game_api.h и brick_game.h
- *
- * ...
- */
+#include <stdlib.h>
 
-#endif //BRICK_GAME_H
+typedef enum {
+  Start,
+  Pause,
+  Terminate,
+  Left,
+  Right,
+  Up,
+  Down,
+  Action,
+} UserAction_t;
+
+typedef struct {
+  int score;
+  int high_score;
+  int level;
+  int speed;
+  int pause;
+  int** field;
+  int** next;
+} GameInfo_t;
+
+#endif  // BRICK_GAME_H
