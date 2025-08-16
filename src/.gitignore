@@ -7,6 +7,8 @@ highscore.txt
 *.obj
 *.elf
 venv/
+*.log
+*.txt
 # Linker output
 *.ilk
 *.map
