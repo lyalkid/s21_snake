@@ -2,22 +2,25 @@
 #include <stdio.h>
 
 #include "brick_game/brick_game.h"
-#include "gui/cli/cli.h"
-
+#include "game_api/game_api.h"
 
 int main() {
-  init_nc();
-  // init ncurses
-  Game_wins_t *game_wins = get_game_wins();
+  // init_game_data();
   int choice = 1;
+  init_nc();
+  get_game_wins();
   while (choice) {
-    choice = handle_menu();
-    if (choice) start_game(&choice);
-    else break;
+    choice = handle_menu();  // frontend, с него получаем сигнал, который выбрал
+    // пользователь
+    if (choice) {
+      clear();
+      start_game(choice);
+    } else {
+      break;
+    }
   }
-  cleanup_game_wins(game_wins);
+
   terminate_ncurses();
   printf("%d", choice);
   return EXIT_SUCCESS;
 }
-int main() { return 0; }

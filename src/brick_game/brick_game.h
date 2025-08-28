@@ -4,7 +4,6 @@
 
 #ifndef BRICK_GAME_H
 #define BRICK_GAME_H
-#include <stdlib.h>
 
 typedef enum {
   Start,
@@ -26,5 +25,16 @@ typedef struct {
   int** field;
   int** next;
 } GameInfo_t;
+
+// void userInput(UserAction_t action, bool hold) {
+//   // else if (*currentGame == GAME_SNAKE) snake_userInput(action, hold);
+// }
+//
+// GameInfo_t updateCurrentState() {
+//   // else return snake_updateCurrentState();
+// }
+
+GameInfo_t* get_game_info();
+GameInfo_t init_empty_gameInfo();
 
 #endif  // BRICK_GAME_H

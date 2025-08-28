@@ -5,22 +5,28 @@ CFLAGS = -c -std=c11 #$(WFLAGS)
 LDFLAGS = -std=c11 #$(WFLAGS)
 
 BRICK_GAME = brick_game
-CORE_TETRIS_DIR = brick_game/tetris/tetris_engine
+CORE_TETRIS_DIR = brick_game/tetris
 GUI_CLI_DIR = gui/cli
+GAME_API = game_api
+UTILS = $(BRICK_GAME)/utils
+
+HEADERS = $(wildcard $(CORE_TETRIS_DIR)/inc/*.h $(CORE_TETRIS_DIR)/*.h $(BRICK_GAME)/*.h $(UTILS)/*.h )
+BRICK_GAME_SRC = $(wildcard $(BRICK_GAME)/*.c)
+TETRIS_SRC = $(wildcard  $(CORE_TETRIS_DIR)/src/*.c )
+#SNAKE_SRC = $(wildcard $(CORE_SNAKE_DIR)/*.c )
+CLI_SRC = $(wildcard $(GUI_CLI_DIR)/*.c $(GUI_CLI_DIR)/*/*.c)
+MAIN_SRC = $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/*.cpp )
+GAME_API_SRC = $(wildcard $(GAME_API)/*.c)
+UTILS_SRC = $(wildcard $(UTILS)/*.c)
 
 
-SRC_DIR = .
- 
+SRC_DIR = . 
 BIN_DIR = bin
 GCOV_DIR = gcov_report
 OBJ_DIR = obj
 DOCS_DIR = docs
 
-HEADERS = $(wildcard $(CORE_TETRIS_DIR)/inc/*.h $(CORE_TETRIS_DIR)/*.h $(BRICK_GAME)/*.h )
-TETRIS_SRC = $(wildcard  $(CORE_TETRIS_DIR)/src/*.c )
-#SNAKE_SRC = $(wildcard $(CORE_SNAKE_DIR)/*.c )
-CLI_SRC = $(wildcard $(GUI_CLI_DIR)/*.c $(GUI_CLI_DIR)/*/*.c)
-MAIN_SRC = $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/*.cpp )
+
 
 UNAME_S := Linux
 ifeq ($(UNAME_S),Linux)
@@ -34,7 +40,7 @@ ifeq ($(UNAME_S),Darwin)
 	TEST_LIB = -lcheck
 endif
 
-all: clean style run_cli
+all: clean style run_tetis
 
 install: style cli
 	mkdir $(BIN_DIR)
@@ -53,12 +59,19 @@ style_test:
 create_file:
 	@test -f highscore.txt || ( touch highscore.txt && echo 0 >> highscore.txt )
 
-cli: create_file 
+tetris:
 	@mkdir $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(ADD_LIB) main_cli.c $(TETRIS_SRC) $(CLI_SRC)
+	$(CC) $(CFLAGS) $(ADD_LIB) main_tetris.c $(TETRIS_SRC) $(CLI_SRC) $(UTILS_SRC) $(BRICK_GAME_SRC)
 	@mv *.o $(OBJ_DIR)
 
-run_cli:clean install
+cli: create_file 
+	@mkdir $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(ADD_LIB) main_cli.c $(TETRIS_SRC) $(CLI_SRC) $(GAME_API_SRC)
+	@mv *.o $(OBJ_DIR)
+
+run_tetis:clean  tetris
+	mkdir $(BIN_DIR)
+	$(CC) $(OBJ_DIR)/*.o -o $(BIN_DIR)/brick_game_cli -lncurses
 	$(BIN_DIR)/brick_game_cli
 
 

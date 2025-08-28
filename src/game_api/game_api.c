@@ -6,26 +6,33 @@
 */
 #include "game_api.h"
 
-void selectGame( GameType game) {
-    GameType* currentGame = getCurrentGameType();
-    *currentGame = game;
+
+
+
+
+
+void start_game(int choice) {
+    switch (choice) {
+        case 1:
+            system("./build/azamat_tetris");
+            break;
+        case 2:
+
+            break;
+        default:
+            break;
+    }
 }
 
-void userInput(UserAction_t action, bool hold) {
-    const GameType* currentGame = getCurrentGameType();
-    if (*currentGame == GAME_TETRIS) tetris_userInput(action, hold);
-    // else if (*currentGame == GAME_SNAKE) snake_userInput(action, hold);
-}
 
-GameInfo_t updateCurrentState() {
-    const GameType* currentGame = getCurrentGameType();
-    if (*currentGame == GAME_TETRIS) return tetris_updateCurrentState();
-    // else return snake_updateCurrentState();
+GameData_t* get_instanse() {
+    static GameData_t* instance;
+    if (instance == NULL) {
+        instance = (GameData_t *) malloc(sizeof(GameData_t));
+    }
+    return instance;
 }
 
 
 
 
-void tetris_userInput(UserAction_t action, bool hold){}
-
-GameInfo_t tetris_updateCurrentState(){}

@@ -11,6 +11,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#include "tetris.h"
+
+int piece_str_to_type(const char *piece);
+
 /**
  * @brief Генератор фигур в стиле TGM3.
  *
@@ -61,4 +66,5 @@ int contains(const char *arr[], int size, const char *value);
  * @return Индекс или -1, если не найдено
  */
 int index_of(const char *arr[], int size, const char *value);
+void next_tetramino(TGM3Randomizer *r);
 #endif  // TGM3RANDOMIZER_H

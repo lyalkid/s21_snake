@@ -4,12 +4,13 @@
  * @details
  *
  */
+#include "../inc/TGM3Randomizer.h"
 #include "../inc/tetris.h"
 
 Tetramino init_empty_tetraMino() {
   Tetramino tetraMino = (Tetramino){0};
-  tetraMino.type = 0;
-  tetraMino.next_type = 0;
+  tetraMino.type =0;
+  tetraMino.next_type = 1;
 
   tetraMino.rotate = 0;
   tetraMino.center_x = 0;
@@ -22,6 +23,17 @@ Tetramino init_empty_tetraMino() {
 
   return tetraMino;
 }
+Tetramino *get_tetramino_instance() {
+  static Tetramino* tetraMino;
+  if (tetraMino == NULL) {
+    tetraMino = malloc(sizeof(Tetramino));
+    *tetraMino = init_empty_tetraMino();
+  }
+  return tetraMino;
+
+
+}
+
 void placeTetraminoInArray(Tetramino tetraMino, int** next) {
   for (int i = 0; i < HEIGHT; i++) {
     for (int j = 0; j < WIDTH; j++) {
@@ -234,35 +246,4 @@ void generateShapeTJL(int coordinates[], int rotate, int type) {
      *
      * */
   }
-}
-
-void spawnNextTetramino(Tetramino* tetraMino) {
-  // int current = tetraMino->type;
-  // int next = tetraMino->next_type;
-
-  // if (current == 0) {
-  //   current = tetraMino->type = get_random(7);
-  //   tetraMino->next_type = get_random(7);
-
-  // } else {
-  //   int tmp = 1;
-  //   int flag = 1;
-  //   while (flag) {
-  //     //      printw("\nfdfdfdfdf");
-  //     tmp = get_random(get_real_len_of_number(tetraMino->meshok.pieses, 7));
-  //     int tmp_q = tetraMino->meshok.pieses[tmp - 1];
-  //     if (tmp_q != 0) {
-  //       tetraMino->next_type = tetraMino->meshok.pieses[tmp - 1];
-  //       current = tetraMino->type = next;
-  //       flag = 0;
-  //       break;
-  //     }
-  //   }
-  // }
-  tetraMino->rotate = COMPLETE;
-  tetraMino->center_x = 0;
-  tetraMino->center_y = 0;
-  null_array(tetraMino->tmp_current_figure_on_field, HEIGHT, WIDTH);
-  generateTetraminoShape(tetraMino->coordinates, tetraMino->rotate,
-                         tetraMino->type);
 }

@@ -7,8 +7,10 @@
 
 #ifndef TETRIS_H
 #define TETRIS_H
-#include "../../../brick_game.h"
-#include "utilities.h"
+#include "../../brick_game.h"
+#include "../../utils/defines.h"
+#include "../../utils/utilities.h"
+
 enum answer { YES, NO };
 /** Статусы функций. */
 enum status { ERROR, MY_OK };
@@ -18,57 +20,6 @@ enum figures { T = 1, J, L, I, S, Z, O };
 
 /** Углы поворота фигур. */
 enum degrees { COMPLETE, RIGHT, STRAIGHT, REFLEX };
-
-/** Нет действия. */
-#define NONE_ACTION 8
-
-/** Высота игрового поля. */
-#define HEIGHT 20
-
-/** Ширина игрового поля. */
-#define WIDTH 10
-
-/** Масштаб отрисовки по X. */
-#define scale_field 2
-
-/** Общий масштаб. */
-#define scale 2
-
-/** Высота окна поля. */
-#define FIELD_Y HEIGHT + 2
-
-/** Ширина окна поля. */
-#define FIELD_X WIDTH *scale_field + 2
-
-/** Размер окна для следующей фигуры. */
-#define NEXT_FIELD 10
-
-/** Размер окна информации. */
-#define INFO_FIELD 10
-
-/** Ширина окна информации. */
-#define INFO_X INFO_FIELD *scale + 2
-
-/** Высота окна информации. */
-#define INFO_Y INFO_FIELD + 2
-
-/** Ширина окна следующей фигуры. */
-#define NEXT_X NEXT_FIELD *scale + 2
-
-/** Высота окна следующей фигуры. */
-#define NEXT_Y NEXT_FIELD
-
-/** Время задержки в микросекундах. */
-#define TIME 2000000
-
-/** Код клавиши Escape. */
-#define ESCAPE 27
-
-/** Код клавиши Enter. */
-#define ENTER_KEY 10
-
-/** Код клавиши пробела. */
-#define SPACE 32
 
 /**
  * @brief Структура тетрамино.
@@ -96,6 +47,8 @@ typedef struct {
  * @return Инициализированная структура Tetramino.
  */
 Tetramino init_empty_tetraMino();
+
+Tetramino *get_tetramino_instance();
 
 /**
  * @brief Преобразует фигуру в 2D-массив.

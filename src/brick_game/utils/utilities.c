@@ -5,15 +5,16 @@
  *
  */
 
-#include "../inc/utilities.h"
+#include "utilities.h"
 
-#include "../inc/tetris.h"
+#include "../tetris/inc/tetris.h"
 
 int** malloc_array(int rows, int cols) {
   int** field = malloc(sizeof(int*) * rows);
   for (int i = 0; i < rows; i++) {
     field[i] = calloc(cols, sizeof(int));
   }
+  null_array(field, rows, cols);
   return field;
 }
 void free_array(int** field, int rows) {
@@ -61,16 +62,22 @@ int get_real_len_of_number(const int a[], int size) {
   return size - count;
 }
 void print_array(int** array) {
+  system("clear");
   printf("--------------------\n");
 
   for (int i = 0; i < HEIGHT; i++) {
     for (int j = 0; j < WIDTH; j++) {
-      printf("%d ", array[i][j]);
+      if (array[i][j]) {
+        printf("%c ", '*');
+      }
+      else printf("  ");
     }
     printf("\n");
   }
   printf("--------------------\n");
 }
+
+
 
 int findIndex(const int array[], int size, int i) {
   int res = 0;
