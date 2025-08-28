@@ -88,7 +88,7 @@ void print_array(int **array, int max_x, int min_x) {
             }
         }
 
-      
+
         printf("\n");
     }
     for (int i = 0; i < WIDTH; i++) {
@@ -102,27 +102,36 @@ void print_array(int **array, int max_x, int min_x) {
     printf("max_x = %d, min_x = %d\n", max_x, min_x);
 }
 
-void overlay_array(int **field, int **next) {
+void overlay_array(int **field, int **next, int max_x, int min_x) {
     for (int j = 0; j < WIDTH; j++) {
         printf("%d ", j);
     }
     printf("\n");
-    for (int j = 0; j < WIDTH; j++) {
-        printf("##");
+    for (int i = 0; i < WIDTH; i++) {
+        if (i <= max_x && i >= min_x) {
+            printf("##");
+        } else {
+            printf("--");
+        }
     }
     printf("\n");
     for (int i = 0; i < HEIGHT; i++) {
         for (int j = 0; j < WIDTH; j++) {
             int res = field[i][j] + next[i][j];
             if (res != 0)
-                printf("%d ", res);
+                // printf("%d ", res);
+                printf("##");
             else
                 printf("  ");
         }
         printf("| %d\n", i);
     }
-    for (int j = 0; j < WIDTH; j++) {
-        printf("##");
+    for (int i = 0; i < WIDTH; i++) {
+        if (i <= max_x && i >= min_x) {
+            printf("##");
+        } else {
+            printf("--");
+        }
     }
     printf("\n");
 }

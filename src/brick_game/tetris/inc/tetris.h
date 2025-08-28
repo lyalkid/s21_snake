@@ -49,7 +49,7 @@ typedef struct {
 Tetramino init_empty_tetraMino();
 
 Tetramino *get_tetramino_instance();
-
+void print_tetramino(Tetramino tetramino);
 /**
  * @brief Преобразует фигуру в 2D-массив.
  *
@@ -158,7 +158,7 @@ int mergeFigureIntoField(int **next, int **field);
  * @param field Игровое поле.
  * @return 1 (MY_OK) если коллизий нет, 0 (ERROR) при коллизии.
  */
-int checkCollisionWithWallsOrBlocks(Tetramino tetraMino, int **field);
+int check_collision(Tetramino tetraMino, int **field);
 /**
  * @brief Проверяет коллизию поля и фигуры.
  *

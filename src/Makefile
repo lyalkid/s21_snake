@@ -1,8 +1,8 @@
 CC = gcc
 CP = g++
-WFLAGS = -Wall -Werror -Wextra
-CFLAGS = -c -std=c11 #$(WFLAGS)
-LDFLAGS = -std=c11 #$(WFLAGS)
+WFLAGS = -Wall -Werror -Wextra  -Wunused-function 
+CFLAGS = -c -std=c11 $(WFLAGS)
+LDFLAGS = -std=c11 $(WFLAGS) -fprofile-arcs -ftest-coverage
 
 BRICK_GAME = brick_game
 CORE_TETRIS_DIR = brick_game/tetris

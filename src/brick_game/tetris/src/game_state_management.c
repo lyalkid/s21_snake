@@ -20,7 +20,7 @@ int mergeFigureIntoField(int** next, int** field) {
   }
   return is_all_ok_val;
 }
-int checkCollisionWithWallsOrBlocks(Tetramino tetraMino, int** field) {
+int check_collision(Tetramino tetraMino, int** field) {
   int is_all_ok_val = MY_OK;
   for (int i = 0; i < 8; i += 2) {
     int x = tetraMino.coordinates[i] + tetraMino.center_x;
