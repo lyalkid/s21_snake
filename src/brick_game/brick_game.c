@@ -26,3 +26,26 @@ GameInfo_t init_empty_gameInfo() {
     gameInfo.next = malloc_array(NEXT_FIELD, NEXT_FIELD);
     return gameInfo;
 }
+
+
+UserAction_t getSignal(int user_input) {
+    UserAction_t sig = NONE_ACTION;
+    if (user_input == 'f') {
+        sig = Up;
+    } else if (user_input == 119) {
+        sig = Action;
+    } else if (user_input == 115) {
+        sig = Down;
+    } else if (user_input == 97) {
+        sig = Left;
+    } else if (user_input == 100) {
+        sig = Right;
+    } else if (user_input == ESCAPE || user_input == 'q' || user_input == 'Q') {
+        sig = Terminate;
+    } else if (user_input == 'n' || user_input == 'N') {
+        sig = Start;
+    } else if (user_input == SPACE || user_input == 'p' || user_input == 'P') {
+        sig = Pause;
+    }
+    return sig;
+}

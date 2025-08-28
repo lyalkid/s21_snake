@@ -78,6 +78,9 @@ void moveTetramino(Tetramino* tetraMino, UserAction_t key) {
     case Action:
       rotate_TetraMino(tetraMino);
       break;
+      case Down:
+        move_down_tetraMino(tetraMino);
+      break;
     default:
       break;
   }

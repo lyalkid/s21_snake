@@ -77,8 +77,10 @@ int get_real_len_of_number(const int a[], int size);
  *   1 0 0 1 ...
  *   --------------------
  */
-void print_array(int **array);
+void print_array(int **array, int max_x, int min_x);
 
+
+void overlay_array(int** field, int** next);
 /**
  * @brief Возвращает минимальное из двух чисел.
  *
