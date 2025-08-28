@@ -34,6 +34,7 @@ int main() {
         // next_tetramino(&r);
         ch = getchar();
         UserAction_t current_action = getSignal(ch);
+        // movement hadle
         if (current_action == Left || current_action == Right || current_action == Action || current_action == Down ) {
             if (current_action == Down) {
                 moveTetramino(tetraMino, current_action);
@@ -51,8 +52,11 @@ int main() {
                     count[tetraMino->type - 1]++;
                 }
             }else {
-                moveTetramino(tetraMino, current_action);
+                if (canMoveTetramino(*tetraMino, game_info->field, current_action) == MY_OK) {
+                    moveTetramino(tetraMino, current_action);
+                    placeTetraminoInArray(*tetraMino, tetraMino->tmp_current_figure_on_field);
 
+                }
             }
         }
         if (ch == '\n') {
