@@ -5,10 +5,9 @@
  *
  */
 
-#include "../inc/TGM3Randomizer.h"
-
 #include "../../utils/defines.h"
 #include "../../utils/utilities.h"
+#include "../inc/tetris.h"
 int piece_str_to_type(const char *piece) {
   if (strcmp(piece, "I") == 0) return I;
   if (strcmp(piece, "J") == 0) return J;
@@ -95,7 +94,7 @@ const char *next_piece(TGM3Randomizer *r) {
   return piece;
 }
 void next_tetramino(TGM3Randomizer *r) {
-  Tetramino* tetramino = get_tetramino_instance();
+  Tetramino *tetramino = get_tetramino_instance();
   tetramino->type = tetramino->next_type;
   tetramino->rotate = COMPLETE;
   tetramino->center_x = 0;
@@ -103,5 +102,5 @@ void next_tetramino(TGM3Randomizer *r) {
   null_array(tetramino->tmp_current_figure_on_field, HEIGHT, WIDTH);
   generateTetraminoShape(tetramino->coordinates, tetramino->rotate,
                          tetramino->type);
-  tetramino->next_type = piece_str_to_type( next_piece(r));
+  tetramino->next_type = piece_str_to_type(next_piece(r));
 }

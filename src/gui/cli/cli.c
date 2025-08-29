@@ -18,7 +18,8 @@ void init_nc() {
   nodelay(stdscr, TRUE);
   keypad(stdscr, TRUE);
   curs_set(0);
-  timeout(1000000);
+  timeout(101);
+
   // инициализация игровых окон
 }
 
@@ -47,6 +48,8 @@ void set_tetris_wins(Tetris_wins_t* t_wins) {
 
 void init_colors() {
   start_color();
+  init_pair(11, COLOR_RED, COLOR_BLACK);
+  init_pair(10, COLOR_WHITE, COLOR_BLACK);
   init_pair(9, COLOR_BLACK, COLOR_BLACK);
   init_pair(1, COLOR_BLACK, COLOR_RED);
   init_pair(2, COLOR_BLACK, COLOR_CYAN);

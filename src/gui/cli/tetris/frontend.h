@@ -11,8 +11,10 @@
 #include "../../../brick_game/brick_game.h"
 #include "../../../brick_game/tetris/inc/tetris.h"
 #include "../cli.h"
-void  draw_tetris(GameInfo_t currentState);
+void  draw_tetris(GameInfo_t currentState, Tetramino t);
 void render_game_win(WINDOW *win, int **field, int **next) ;
+void render_next_win(WINDOW* next_win, int type);
+void render_info_win(WINDOW* info_win, int h_score, int score, int level);
 
 
 

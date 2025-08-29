@@ -7,11 +7,11 @@
 
 #include "../inc/tetramino_movement.h"
 
-int canMoveTetramino(Tetramino tetraMino, int** field, UserAction_t key) {
-  int** next = malloc_array(HEIGHT, WIDTH);
-  int** tmp_next = malloc_array(HEIGHT, WIDTH);
+int canMoveTetramino(Tetramino tetraMino, int **field, UserAction_t key) {
+  int **next = malloc_array(HEIGHT, WIDTH);
+  int **tmp_next = malloc_array(HEIGHT, WIDTH);
 
-  int** tmp_field = malloc_array(HEIGHT, WIDTH);
+  int **tmp_field = malloc_array(HEIGHT, WIDTH);
   placeTetraminoInArray(tetraMino, next);
   moveTetramino(&tetraMino, key);
   placeTetraminoInArray(tetraMino, next);
@@ -26,6 +26,7 @@ int canMoveTetramino(Tetramino tetraMino, int** field, UserAction_t key) {
 
   return is_all_ok_val;
 }
+
 int is_rotate_possible(Tetramino tetraMino, int rotate) {
   int possible = 1;
   tetraMino.rotate = rotate;
@@ -41,21 +42,23 @@ int is_rotate_possible(Tetramino tetraMino, int rotate) {
   }
   return possible;
 }
+
 int isHorizontalMoveOrRotate(UserAction_t userAction) {
   int res = MY_OK;
   if (!(userAction == Left || userAction == Right || userAction == Action))
     res = ERROR;
   return res;
 }
+
 int isDownMove(UserAction_t userAction) {
   int res = MY_OK;
-  if (userAction == Down) {
+  if (userAction != Down) {
     res = ERROR;
   }
   return res;
 }
 
-void moveTetramino(Tetramino* tetraMino, UserAction_t key) {
+void moveTetramino(Tetramino *tetraMino, UserAction_t key) {
   // TODO уменьшить размер строк
 
   int min_x =
@@ -78,20 +81,21 @@ void moveTetramino(Tetramino* tetraMino, UserAction_t key) {
     case Action:
       rotate_TetraMino(tetraMino);
       break;
-      case Down:
-        move_down_tetraMino(tetraMino);
+    case Down:
+      move_down_tetraMino(tetraMino);
       break;
     default:
       break;
   }
 }
 
-void move_down_tetraMino(Tetramino* tetraMino) { tetraMino->center_y += 1; }
+void move_down_tetraMino(Tetramino *tetraMino) { tetraMino->center_y += 1; }
 
-void move_up_tetraMino(Tetramino* tetraMino) {
+void move_up_tetraMino(Tetramino *tetraMino) {
   if (tetraMino->center_y >= HEIGHT - 1) tetraMino->center_y -= 1;
 }
-void rotate_TetraMino(Tetramino* tetraMino) {
+
+void rotate_TetraMino(Tetramino *tetraMino) {
   int rotate = (tetraMino->rotate + 1) % 4;
 
   if (is_rotate_possible(*tetraMino, rotate)) {

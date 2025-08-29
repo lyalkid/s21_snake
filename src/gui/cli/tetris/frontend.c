@@ -7,14 +7,19 @@
 
 #include "frontend.h"
 
+#include "../../../brick_game/tetris/game_api/game_api.h"
 #include "../cli.h"
 
-void draw_tetris(GameInfo_t currentState) {
-     Tetris_wins_t *t_wins = get_tetris_wins();
-    render_game_win(t_wins->game_win, currentState.field, currentState.next);
+void draw_tetris(GameInfo_t currentState, Tetramino t) {
+  Tetris_wins_t *t_wins = get_tetris_wins();
+  render_game_win(t_wins->game_win, currentState.field,
+                  t.tmp_current_figure_on_field);
+  render_info_win(t_wins->info_win, currentState.high_score, currentState.score,
+                  currentState.level);
+  render_next_win(t_wins->next_win, t.next_type);
 }
 
-void render_game_win(WINDOW* win, int** field, int** next) {
+void render_game_win(WINDOW *win, int **field, int **next) {
   werase(win);
 
   for (int i = 0; i < HEIGHT; i++) {
@@ -23,12 +28,11 @@ void render_game_win(WINDOW* win, int** field, int** next) {
       if ((res != 0 && field[i][j] == 0) || field[i][j] != 0) {
         wattron(win, COLOR_PAIR(res));
 
-        mvwprintw(win, i + 1, j * scale_field + 1, "  ");
+        mvwprintw(win, i + 1, j * scale_field + 1, "[]");
 
         wattroff(win, COLOR_PAIR(res));
-
       } else {
-        mvwprintw(win, i + 1, j * scale_field + 1, "[]");
+        mvwprintw(win, i + 1, j * scale_field + 1, "- ");
       }
     }
   }
@@ -37,97 +41,97 @@ void render_game_win(WINDOW* win, int** field, int** next) {
   wrefresh(win);
   refresh();
 }
-//
-// void render_next_win(WINDOW* next_win, int type) {
-//   werase(next_win);
-//
-//   mvwprintw(next_win, 1, 4 * 2, "NEXT");
-//   mvwprintw(next_win, 2, 3 * 2, "TETRAMINO:");
-//
-//   int coordinates[8] = {};
-//   get_TetraMino(coordinates, COMPLETE, type);
-//
-//   for (int i = 0; i < 8; i += 2) {
-//     int x = coordinates[i];
-//     int y = coordinates[i + 1] + 5;
-//     if (x < 1 || x > NEXT_X || y > NEXT_Y || y < 1) {
-//       mvwprintw(next_win, 1, 1, "smth wrong\n x:%d\n y:%d\n", x, y);
-//       //      break;
-//     } else {
-//       wattron(next_win, COLOR_PAIR(type));
-//       mvwprintw(next_win, y, x * 2 + 1, "  ");
-//       wattroff(next_win, COLOR_PAIR(type));
-//     }
-//   }
-//
-//   box(next_win, 0, 0);
-//   wrefresh(next_win);
-//   refresh();
-// }
-// void render_info_win(WINDOW* info_win, int h_score, int score, int level,
-//                      int count[]) {
-//   werase(info_win);
-//
-//   int stat_w = 7 * 2, stat_h = 1;
-//   wattron(info_win, COLOR_PAIR(4));
-//   mvwprintw(info_win, 1, 2, "high_score:");
-//   mvwprintw(info_win, 2, 2, "%d", h_score > score ? h_score : score);
-//   wattroff(info_win, COLOR_PAIR(4));
-//   wattron(info_win, COLOR_PAIR(6));
-//
-//   mvwprintw(info_win, 4, 2, "score:");
-//   mvwprintw(info_win, 5, 2, "%d", score);
-//   wattroff(info_win, COLOR_PAIR(6));
-//   wattron(info_win, COLOR_PAIR(7));
-//
-//   mvwprintw(info_win, 7, 2, "level:");
-//
-//   mvwprintw(info_win, 8, 2, "%d", level);
-//   wattroff(info_win, COLOR_PAIR(7));
-//
-//   mvwprintw(info_win, stat_h, stat_w, "STATS:");
-//   for (int i = 0; i < 7; i++) {
-//     mvwprintw(info_win, stat_h + i + 1, stat_w, "%c:%d", piece(i + 1),
-//               count[i]);
-//   }
-//   box(info_win, 0, 0);
-//   wrefresh(info_win);
-//   refresh();
-// }
-//
-// char piece(int type) {
-//   char r = '0';
-//   switch (type) {
-//     case T:
-//       r = 'T';
-//       break;
-//
-//     case O:
-//       r = 'O';
-//       break;
-//
-//     case S:
-//       r = 'S';
-//       break;
-//
-//     case Z:
-//       r = 'Z';
-//       break;
-//
-//     case L:
-//       r = 'L';
-//       break;
-//
-//     case J:
-//       r = 'J';
-//       break;
-//     case I:
-//       r = 'I';
-//       break;
-//   }
-//   return r;
-// }
 
+void render_next_win(WINDOW *next_win, int type) {
+  werase(next_win);
+
+  mvwprintw(next_win, 1, 4 * 2, "NEXT");
+  mvwprintw(next_win, 2, 3 * 2, "TETRAMINO:");
+
+  int coordinates[8] = {};
+  generateTetraminoShape(coordinates, COMPLETE, type);
+
+  for (int i = 0; i < 8; i += 2) {
+    int x = coordinates[i];
+    int y = coordinates[i + 1] + 5;
+    if (x < 1 || x > NEXT_X || y > NEXT_Y || y < 1) {
+      mvwprintw(next_win, 1, 1, "smth wrong\n x:%d\n y:%d\n", x, y);
+      //      break;
+    } else {
+      wattron(next_win, COLOR_PAIR(type));
+      mvwprintw(next_win, y, x * 2 + 1, "  ");
+      wattroff(next_win, COLOR_PAIR(type));
+    }
+  }
+
+  box(next_win, 0, 0);
+  wrefresh(next_win);
+  refresh();
+}
+
+void render_info_win(WINDOW *info_win, int h_score, int score, int level) {
+  werase(info_win);
+
+  int stat_w = 7 * 2, stat_h = 1;
+  wattron(info_win, COLOR_PAIR(4));
+  mvwprintw(info_win, 1, 2, "high_score:");
+  mvwprintw(info_win, 2, 2, "%d", h_score > score ? h_score : score);
+  wattroff(info_win, COLOR_PAIR(4));
+  wattron(info_win, COLOR_PAIR(6));
+
+  mvwprintw(info_win, 4, 2, "score:");
+  mvwprintw(info_win, 5, 2, "%d", score);
+  wattroff(info_win, COLOR_PAIR(6));
+  wattron(info_win, COLOR_PAIR(7));
+
+  mvwprintw(info_win, 7, 2, "level:");
+
+  mvwprintw(info_win, 8, 2, "%d", level);
+  // mvwprintw(info_win, 7, 2, "State:%d", *get_state());
+  wattroff(info_win, COLOR_PAIR(7));
+
+  // mvwprintw(info_win, stat_h, stat_w, "STATS:");
+  // for (int i = 0; i < 7; i++) {
+  //   mvwprintw(info_win, stat_h + i + 1, stat_w, "%c:%d", piece(i + 1),
+  //             count[i]);
+  // }
+  box(info_win, 0, 0);
+  wrefresh(info_win);
+  refresh();
+}
+
+char piece(int type) {
+  char r = '0';
+  switch (type) {
+    case T:
+      r = 'T';
+      break;
+
+    case O:
+      r = 'O';
+      break;
+
+    case S:
+      r = 'S';
+      break;
+
+    case Z:
+      r = 'Z';
+      break;
+
+    case L:
+      r = 'L';
+      break;
+
+    case J:
+      r = 'J';
+      break;
+    case I:
+      r = 'I';
+      break;
+  }
+  return r;
+}
 
 // void init_ncurses(Tetris_wins_t* t_wins) {
 //   initscr();
@@ -145,7 +149,8 @@ void render_game_win(WINDOW* win, int** field, int** next) {
 //       newwin(FIELD_Y, FIELD_X, (h - FIELD_Y) / 2, (w - FIELD_X) / 2);
 //   t_wins->info_win = newwin(INFO_Y - 2, INFO_X, 0 + (h - FIELD_Y) / 2,
 //                             FIELD_X + (w - FIELD_X) / 2);
-//   t_wins->next_win = newwin(NEXT_Y + 2, NEXT_X, INFO_Y - 2 + (h - FIELD_Y) / 2,
+//   t_wins->next_win = newwin(NEXT_Y + 2, NEXT_X, INFO_Y - 2 + (h - FIELD_Y) /
+//   2,
 //                             FIELD_X + (w - FIELD_X) / 2);
 //
 //   refresh();

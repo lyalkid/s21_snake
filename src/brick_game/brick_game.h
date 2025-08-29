@@ -34,7 +34,7 @@ typedef struct {
 //   // else return snake_updateCurrentState();
 // }
 
-GameInfo_t* get_game_info();
+GameInfo_t* get_game_info_instance();
 GameInfo_t init_empty_gameInfo();
 UserAction_t getSignal(int user_input);
 #endif  // BRICK_GAME_H

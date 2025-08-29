@@ -5,89 +5,83 @@
  *
  */
 #include "brick_game/brick_game.h"
+#include "brick_game/tetris/game_api/game_api.h"
 #include "brick_game/tetris/inc/tetramino_movement.h"
 #include  "brick_game/tetris/inc/tetris.h"
-#include "brick_game/tetris/inc/TGM3Randomizer.h"
-// #include "gui/cli/cli.h"
-// #include "gui/cli/tetris/frontend.h"
+#include "brick_game/tetris/inc/Timer.h"
+#include "gui/cli/cli.h"
+#include "gui/cli/tetris/frontend.h"
 
 int main() {
     srand(time(0));
     // setup ncurses and windows
-    // init_nc();
-    // Tetris_wins_t* t_wins = get_tetris_wins();
-    // set_tetris_wins(t_wins);
+    init_nc();
+    Tetris_wins_t *t_wins = get_tetris_wins();
+    set_tetris_wins(t_wins);
+    State *state = get_state();
+    *state = start;
 
     // initialization game_info
-    GameInfo_t *game_info = get_game_info();
+    GameInfo_t *game_info = get_game_info_instance();
     *game_info = init_empty_gameInfo();
     int ch = -1;
+
+    // initialize figure
     Tetramino *tetraMino = get_tetramino_instance();
-    TGM3Randomizer r;
-    init_randomizer(&r);
     generateTetraminoShape(tetraMino->coordinates, tetraMino->rotate, tetraMino->type);
-    int c = 0;
-    int count[7] = {};
-    count[tetraMino->type - 1]++;
+
+    // initialize timer
+    Shift_timer *timer = get_shift_timer_instance();
+
 
     while (ch != 'q') {
-        // next_tetramino(&r);
-        ch = getchar();
+
+        ch = getch();
+        mvprintw(22, 13, "%c", ch);
+        mvprintw(23, 13, "%s", stateToString(*state));
+        mvprintw(24, 13, "delay: %lf",(double) timer->delay_to_shift);
+        mvprintw(25, 13, "level: %d",game_info->level);
+        mvprintw(26, 13, "speed: %lf",(double)game_info->speed);
         UserAction_t current_action = getSignal(ch);
         // movement hadle
-        if (current_action == Left || current_action == Right || current_action == Action || current_action == Down ) {
-            if (current_action == Down) {
-                moveTetramino(tetraMino, current_action);
-                if (check_collision(*tetraMino, game_info->field) == ERROR ) {
-                    tetraMino->center_y--;
-                    // attaching
-                    placeTetraminoInArray(*tetraMino, tetraMino->tmp_current_figure_on_field);
-                    mergeFigureIntoField(tetraMino->tmp_current_figure_on_field, game_info->field);
-
-                    // calc score
-                    game_info->score += calc_score( removeFullLines(game_info->field, HEIGHT, WIDTH));
-
-                    // spawn
-                    next_tetramino(&r);
-                    count[tetraMino->type - 1]++;
+        userInput(current_action, false);
+        switch (*state) {
+            case movement:
+                if (isHorizontalMoveOrRotate(current_action) == MY_OK) {
+                    onMoving(current_action);
+                } else if (isDownMove(current_action)) {
+                    onDownMoving(current_action);
                 }
-            }else {
-                if (canMoveTetramino(*tetraMino, game_info->field, current_action) == MY_OK) {
-                    moveTetramino(tetraMino, current_action);
-                    placeTetraminoInArray(*tetraMino, tetraMino->tmp_current_figure_on_field);
-
+                break;
+            case shift:
+                if (timer->time_to_shift == true) {
+                    onDownMoving(Down);
+                    timer->time_to_shift = false;
+                    gettimeofday(&timer->before, NULL);
                 }
-            }
+                break;
+
+            // case spawn:
+            //     next_tetramino(&tetraMino->r);
+            //     state = get_state();
+            //     break;
+
+            case pause:
+                while (getch()!= 'p') {
+                    timeout(10);
+                }
+                *state = start;
+                break;
+            case game_over:
+                while (getch()!= 'p') {
+                    timeout(1000);
+                }
+                break;
+            default:
+                break;
+                *state = shift;
         }
-        if (ch == '\n') {
-            continue;
-        }
-        placeTetraminoInArray(*tetraMino, tetraMino->tmp_current_figure_on_field);
-        // print_array(game_info->field);
-        int min_x =
-                       get_min(get_min(tetraMino->coordinates[0], tetraMino->coordinates[2]),
-                               get_min(tetraMino->coordinates[4], tetraMino->coordinates[6])) +
-                       tetraMino->center_x;
-
-        int max_x =
-                get_max(get_max(tetraMino->coordinates[0], tetraMino->coordinates[2]),
-                        get_max(tetraMino->coordinates[4], tetraMino->coordinates[6])) +
-                tetraMino->center_x;
-        overlay_array(game_info->field, tetraMino->tmp_current_figure_on_field, max_x, min_x);
-        printf("type %d\n", tetraMino->type);
-
-        printf("stats: ");
-        for (int i = 0; i < 7; i++) {
-            printf("%d ", count[i]);
-        }
-        printf("\n");
-        printf("%d \n", c);
-        c++;
-
-        printf("%d \n", game_info->score);
-
-
-        // print_array(tetraMino->tmp_current_figure_on_field, max_x, min_x);
-        // print_tetramino(*tetraMino);
+        draw_tetris(updateCurrentState(), *tetraMino);
+        countTime(timer);
     };
 }
