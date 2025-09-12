@@ -12,8 +12,9 @@ void print_tetramino(Tetramino tetramino) {
 }
 
 Tetramino init_empty_tetraMino() {
-  Tetramino tetraMino = (Tetramino){0};
+  Tetramino tetraMino = {0};
   tetraMino.type = 0;
+
   tetraMino.next_type = 1;
 
   tetraMino.rotate = 0;
@@ -26,32 +27,31 @@ Tetramino init_empty_tetraMino() {
   tetraMino.tmp_current_figure_on_field = malloc_array(HEIGHT, WIDTH);
 
   init_randomizer(&tetraMino.r);
-
   return tetraMino;
 }
 
-Tetramino *get_tetramino_instance() {
-  static Tetramino *t;
-  if (t == NULL) {
-    t = malloc(sizeof(Tetramino));
-    // *t = init_empty_tetraMino();
-
-    t->type = 0;
-    t->next_type = 1;
-
-    t->rotate = 0;
-    t->center_x = 0;
-    t->center_y = 0;
-    for (int i = 0; i < 8; i++) {
-      t->coordinates[i] = 0;
-    }
-
-    t->tmp_current_figure_on_field = malloc_array(HEIGHT, WIDTH);
-
-    init_randomizer(&t->r);
-  }
-  return t;
-}
+// Tetramino *get_tetramino_instance() {
+//   static Tetramino *t;
+//   if (t == NULL) {
+//     t = malloc(sizeof(Tetramino));
+//     // *t = init_empty_tetraMino();
+//
+//     t->type = 0;
+//     t->next_type = 1;
+//
+//     t->rotate = 0;
+//     t->center_x = 0;
+//     t->center_y = 0;
+//     for (int i = 0; i < 8; i++) {
+//       t->coordinates[i] = 0;
+//     }
+//
+//     t->tmp_current_figure_on_field = malloc_array(HEIGHT, WIDTH);
+//
+//     init_randomizer(&t->r);
+//   }
+//   return t;
+// }
 
 void placeTetraminoInArray(Tetramino tetraMino, int **next) {
   for (int i = 0; i < HEIGHT; i++) {

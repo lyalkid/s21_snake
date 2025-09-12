@@ -8,22 +8,23 @@
 
 #include "utils/defines.h"
 #include "utils/utilities.h"
-GameInfo_t* get_game_info_instance() {
-  static GameInfo_t* game_info;
-  if (game_info == NULL) {
-    game_info = malloc(sizeof(GameInfo_t));
-    game_info->score = 0;
-    game_info->high_score = 0;
-    game_info->level = 1;
-    game_info->pause = 0;
-    game_info->speed = 0;
-    game_info->field = malloc_array(HEIGHT, WIDTH);
-    game_info->next = malloc_array(NEXT_FIELD, NEXT_FIELD);
-  }
-  return game_info;
-}
-GameInfo_t init_empty_gameInfo() {
-  GameInfo_t gameInfo = {0};
+// GameInfo_t* get_game_info_instance() {
+//   static GameInfo_t* game_info;
+//   if (game_info == NULL) {
+//     game_info = malloc(sizeof(GameInfo_t));
+//     game_info->score = 0;
+//     game_info->high_score = 0;
+//     game_info->level = 1;
+//     game_info->pause = 0;
+//     game_info->speed = 0;
+//     game_info->field = malloc_array(HEIGHT, WIDTH);
+//     game_info->next = malloc_array(NEXT_FIELD, NEXT_FIELD);
+//   }
+//   return game_info;
+// }
+
+GameInfo_t init_empty_gameInfo(void) {
+  GameInfo_t gameInfo;
   gameInfo.score = 0;
   gameInfo.high_score = 0;
   gameInfo.level = 0;
@@ -38,13 +39,13 @@ UserAction_t getSignal(int user_input) {
   UserAction_t sig = NONE_ACTION;
   if (user_input == 'f') {
     sig = Up;
-  } else if (user_input == 119) {
+  } else if (user_input == 'w') {
     sig = Action;
-  } else if (user_input == 115) {
+  } else if (user_input == 's') {
     sig = Down;
-  } else if (user_input == 97) {
+  } else if (user_input == 'a') {
     sig = Left;
-  } else if (user_input == 100) {
+  } else if (user_input == 'd') {
     sig = Right;
   } else if (user_input == ESCAPE || user_input == 'q' || user_input == 'Q') {
     sig = Terminate;

@@ -19,9 +19,6 @@
 /** Масштаб отрисовки по X. */
 #define scale_field 2
 
-/** Общий масштаб. */
-#define scale 2
-
 /** Высота окна поля. */
 #define FIELD_Y 22  // height 20 + 2
 

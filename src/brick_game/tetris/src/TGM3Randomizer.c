@@ -7,6 +7,7 @@
 
 #include "../../utils/defines.h"
 #include "../../utils/utilities.h"
+#include "../game_api/game_api.h"
 #include "../inc/tetris.h"
 int piece_str_to_type(const char *piece) {
   if (strcmp(piece, "I") == 0) return I;
@@ -51,7 +52,7 @@ void init_randomizer(TGM3Randomizer *r) {
 
   r->order[0] = firstPiece;
   r->order_size = 1;
-  get_tetramino_instance()->type = piece_str_to_type(firstPiece);
+  get_data()->current_tetraMino.type = piece_str_to_type(firstPiece);
   // get_tetramino_instance()->next_type = piece_str_to_type(next_piece(r));
 }
 
@@ -94,7 +95,7 @@ const char *next_piece(TGM3Randomizer *r) {
   return piece;
 }
 void next_tetramino(TGM3Randomizer *r) {
-  Tetramino *tetramino = get_tetramino_instance();
+  Tetramino *tetramino = &get_data()->current_tetraMino;
   tetramino->type = tetramino->next_type;
   tetramino->rotate = COMPLETE;
   tetramino->center_x = 0;

@@ -133,6 +133,31 @@ char piece(int type) {
   return r;
 }
 
+void draw_static(int state, Tetris_wins_t *t_wins) {
+  if (state == STATE_START) {
+    print_welcome_tetris(t_wins);
+  } else if (state == STATE_PAUSE) {
+    render_pause(t_wins->game_win);
+  } else if (state == STATE_GAME_OVER) {
+    render_game_over(t_wins->game_win);
+  }
+}
+void print_welcome_tetris(Tetris_wins_t *t_wins) {
+  WINDOW *main_menu_win = t_wins->game_win;
+  werase(main_menu_win);
+  mvwprintw(main_menu_win, 1, WIDTH / 2, "HELLO ");
+  mvwprintw(main_menu_win, HEIGHT / 2 + 1, 1, "W,A,S,D - to move");
+  mvwprintw(main_menu_win, HEIGHT / 2 + 2, 1, "G - PAUSE");
+  mvwprintw(main_menu_win, HEIGHT / 2 + 3, 1,
+            "Q or ESCAPE -\n exit session/game ");
+  mvwprintw(main_menu_win, HEIGHT / 2 + 5, 1,
+            "N or ENTER - \n start/resume game ");
+
+  box(main_menu_win, 0, 0);
+  wrefresh(main_menu_win);
+  refresh();
+}
+
 // void init_ncurses(Tetris_wins_t* t_wins) {
 //   initscr();
 //   cbreak();
@@ -207,20 +232,20 @@ char piece(int type) {
 //   refresh();
 // }
 
-// void game_over(WINDOW* game_win) {
-//   werase(game_win);
-//   mvwprintw(game_win, HEIGHT / 2, WIDTH / 2, "IT's");
-//   mvwprintw(game_win, HEIGHT / 2 + 1, WIDTH / 2, "GAME OVER");
-//
-//   box(game_win, 0, 0);
-//   wrefresh(game_win);
-//   refresh();
-// }
+void render_game_over(WINDOW *game_win) {
+  werase(game_win);
+  mvwprintw(game_win, HEIGHT / 2, WIDTH / 2, "IT's");
+  mvwprintw(game_win, HEIGHT / 2 + 1, WIDTH / 2, "GAME OVER");
 
-// void render_pause(WINDOW* game_win) {
-//   werase(game_win);
-//   mvwprintw(game_win, HEIGHT / 2, WIDTH / 2, "PAUSE ");
-//   box(game_win, 0, 0);
-//   wrefresh(game_win);
-//   refresh();
-// }
+  box(game_win, 0, 0);
+  wrefresh(game_win);
+  refresh();
+}
+
+void render_pause(WINDOW *game_win) {
+  werase(game_win);
+  mvwprintw(game_win, HEIGHT / 2, WIDTH / 2, "PAUSE ");
+  box(game_win, 0, 0);
+  wrefresh(game_win);
+  refresh();
+}

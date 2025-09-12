@@ -18,7 +18,7 @@ void init_nc() {
   nodelay(stdscr, TRUE);
   keypad(stdscr, TRUE);
   curs_set(0);
-  timeout(101);
+  timeout(0);
 
   // инициализация игровых окон
 }
@@ -113,6 +113,7 @@ int handle_menu() {
   int choice = 0;
   int c = 0;
   while (1) {
+    timeout(100000);
     print_menu(get_game_wins()->menu_win, highlight, list);
     c = wgetch(get_game_wins()->menu_win);
     if (c == KEY_UP || c == CONTROL_UP) {

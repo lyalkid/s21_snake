@@ -8,8 +8,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef __WIN32
+#include <ncurses/ncurses.h>
+#else
 #include <ncurses.h>
-#include "../../brick_game/brick_game.h"
+#endif
+# include "../../brick_game/brick_game.h"
 #include "../../brick_game/tetris/inc/tetris.h"
 
 

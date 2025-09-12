@@ -65,6 +65,15 @@ typedef struct {
   TGM3Randomizer r;
 } Tetramino;
 
+/**
+ * @brief Создает пустую фигуру.
+ *
+ * @return Инициализированная структура Tetramino.
+ */
+Tetramino init_empty_tetraMino();
+
+// Tetramino *get_tetramino_instance();
+
 int piece_str_to_type(const char *piece);
 
 /**
@@ -103,14 +112,6 @@ int contains(const char *arr[], int size, const char *value);
 int index_of(const char *arr[], int size, const char *value);
 void next_tetramino(TGM3Randomizer *r);
 
-/**
- * @brief Создает пустую фигуру.
- *
- * @return Инициализированная структура Tetramino.
- */
-Tetramino init_empty_tetraMino();
-
-Tetramino *get_tetramino_instance();
 void print_tetramino(Tetramino tetramino);
 /**
  * @brief Преобразует фигуру в 2D-массив.
@@ -204,7 +205,8 @@ int calc_score(int lines);
  * @details Формула: level = current_score / 600, максимум 10.
  */
 int calc_level(int current_score);
-GameInfo_t init_empty_gameInfo();
+
+GameInfo_t init_empty_gameInfo(void);
 /**
  * @brief Объединяет поле с фигурой.
  *

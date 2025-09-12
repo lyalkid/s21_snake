@@ -10,24 +10,32 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
 #define TIME 1000000  // 2 seconds
-#include "../../brick_game.h"
+
 typedef struct {
-  struct timeval before;
-  struct timeval after;
-  suseconds_t delay_to_shift;  // через какое время делать shift
+  long tv_sec;
+  long tv_usec;
+} time_val;
+
+typedef struct {
+  time_val before;
+  time_val after;
+  long delay_to_shift;  // через какое время делать shift
   bool time_to_shift;  // показывает нужно ли делать shift
 } Shift_timer;
 
-int is_time_to_shift(struct timeval before, struct timeval after,
-                     suseconds_t timer);
+Shift_timer init_shift_timer();
+// Shift_timer *get_shift_timer_instance();
+
+int is_time_to_shift(time_val before, time_val after, long timer);
 
 void countTime(Shift_timer *timer);
 
 void init_timer(Shift_timer *timer);
+#include <stdint.h>
 
-Shift_timer init_shift_timer();
-Shift_timer *get_shift_timer_instance();
+int get_time(time_val *tp);
 
 #endif  // TIMER_H

@@ -1,6 +1,6 @@
 CC = gcc
 CP = g++
-WFLAGS = #-Wall -Werror -Wextra  -Wunused-function 
+WFLAGS = #-Wall -Werror -Wextra  -Wunused-function
 CFLAGS = -c -std=c11 $(WFLAGS)
 LDFLAGS = -std=c11 $(WFLAGS) -fprofile-arcs -ftest-coverage
 
@@ -19,14 +19,12 @@ GAME_API_SRC = $(wildcard $(GAME_API)/*.c)
 UTILS_SRC = $(wildcard $(UTILS)/*.c)
 
 
-SRC_DIR = . 
+SRC_DIR = .
 BIN_DIR = bin
 GCOV_DIR = gcov_report
 OBJ_DIR = obj
+
 DOCS_DIR = docs
-
-
-
 UNAME_S := Linux
 ifeq ($(UNAME_S),Linux)
  	OPEN_CMD = firefox
@@ -38,11 +36,9 @@ ifeq ($(UNAME_S),Darwin)
 	ADD_LIB = -lncurses
 	TEST_LIB = -lcheck
 endif
-
 all: clean style run_tetis
 
 install: style cli
-	mkdir $(BIN_DIR)
 	$(CC) $(OBJ_DIR)/*.o -o $(BIN_DIR)/brick_game_cli -lncurses
 
 dvi:
@@ -50,7 +46,7 @@ dvi:
 	doxygen Doxyfile
 
 style:
-	@clang-format --style=Google -i $(TETRIS_SRC)   $(CLI_SRC) $(HEADERS)  $(TETRIS_SRC) $(CLI_SRC) $(UTILS_SRC) $(BRICK_GAME_SRC) $(GAME_API_SRC)
+	@clang-format --style=Google -i $(TETRIS_SRC) *.c  $(CLI_SRC) $(HEADERS)  $(TETRIS_SRC) $(CLI_SRC) $(UTILS_SRC) $(BRICK_GAME_SRC) $(GAME_API_SRC)
 
 style_test:
 	@clang-format --style=Google -n $(TETRIS_SRC) $(MAIN_SRC)  $(CLI_SRC) $(HEADERS)
@@ -58,21 +54,27 @@ style_test:
 create_file:
 	@test -f highscore.txt || ( touch highscore.txt && echo 0 >> highscore.txt )
 
-tetris:
-	@mkdir $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(ADD_LIB) main_tetris.c $(TETRIS_SRC) $(CLI_SRC) $(UTILS_SRC) $(BRICK_GAME_SRC) $(GAME_API_SRC)
+cli: create_file tetris
+
+	$(CC) $(CFLAGS) $(ADD_LIB) main_cli.c  $(GUI_CLI_DIR)/*.c
+	$(CC) *.o -o $(BIN_DIR)/main_cli -lncurses
 	@mv *.o $(OBJ_DIR)
 
-cli: create_file 
-	@mkdir $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(ADD_LIB) main_cli.c $(TETRIS_SRC) $(CLI_SRC) $(GAME_API_SRC)
-	@mv *.o $(OBJ_DIR)
+tetris:
+	mkdir $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(ADD_LIB) main_tetris.c $(TETRIS_SRC) $(CLI_SRC) $(UTILS_SRC) $(BRICK_GAME_SRC) $(GAME_API_SRC)
+	mv *.o $(OBJ_DIR)
+	mkdir $(BIN_DIR)
+	$(CC) $(OBJ_DIR)/*.o -o $(BIN_DIR)/t_cli -lncurses -lm
+
+
+
 
 run_tetis:clean  tetris
-	mkdir $(BIN_DIR)
 	$(CC) $(OBJ_DIR)/*.o -o $(BIN_DIR)/brick_game_cli -lncurses -lm
 	$(BIN_DIR)/brick_game_cli
 
 
 clean:
 	rm -rf ./$(BIN_DIR) ./$(OBJ_DIR) *.out *.o  ./$(DOCS_DIR)
+
