@@ -76,5 +76,7 @@ run_tetis:clean  tetris
 
 
 clean:
-	rm -rf ./$(BIN_DIR) ./$(OBJ_DIR) *.out *.o  ./$(DOCS_DIR)
+	rm -rf ./$(BIN_DIR) ./$(OBJ_DIR) *.out *.o  ./$(DOCS_DIR) ./build
 
+t:
+	cd build && cmake .. &&  	make &&	./main_cli

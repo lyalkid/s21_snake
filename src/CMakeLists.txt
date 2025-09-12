@@ -65,7 +65,7 @@ add_executable(main_tetris main_tetris.c
                 brick_game/tetris/src/Timer.c
                 brick_game/tetris/game_api/game_api.c
                 gui/cli/cli.c
-                gui/cli/tetris/frontend.c
+#                gui/cli/tetris/frontend.c
 )
-target_link_libraries(main_tetris PRIVATE brick_game cli ncurses)
+target_link_libraries(main_tetris PRIVATE  cli m ncurses)
 

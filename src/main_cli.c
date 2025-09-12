@@ -6,7 +6,7 @@ void start_game(int choice) {
   endwin();  // завершили текущую ncurses-сессию
   switch (choice) {
     case 1:
-      system("./bin/t_cli");
+      system("./build/main_tetris");
       init_nc();
       break;
     case 2:
