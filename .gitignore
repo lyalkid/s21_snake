@@ -1,6 +1,6 @@
 # Prerequisites
 *.d
-highscore.txt
+# highscore.txt
 # Object files
 *.o
 *.ko
@@ -8,7 +8,7 @@ highscore.txt
 *.elf
 venv/
 *.log
-*.txt
+# *.txt
 # Linker output
 *.ilk
 *.map
