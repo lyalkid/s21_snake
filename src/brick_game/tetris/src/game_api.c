@@ -197,71 +197,11 @@ void attach_tetramino(TetrisData_t *data) {
     get_data()->current_state = STATE_SPAWN;
 }
 
-// void game_fsm(TetrisData_t *data) {
-//     UserAction_t action = data->current_action;
-//     int is_game_over = MY_OK;
-//     switch (data->current_state) {
-//         case STATE_INITIALIZE:
-//             if (data->current_game_info.field != NULL &&
-//                 data->current_tetraMino.tmp_current_figure_on_field != NULL) {
-//                 reset_game(TODO);
-//             }
-//             data->current_state = STATE_SPAWN;
-
-//             break;
-//         case STATE_SPAWN:
-//             is_game_over =
-//                     spawn_figure(&data->current_tetraMino, &data->current_game_info);
-//             if (!is_game_over) {
-//                 data->current_state = STATE_GAME_OVER;
-//             } else {
-//                 // spawn figure
-//                 data->current_state = STATE_MOVEMENT;
-//             }
-//             break;
-//         case STATE_MOVEMENT:
-//             int shift = MY_OK;
-//             if (isHorizontalMoveOrRotate(data->current_action) == MY_OK) {
-//                 onMoving(data->current_action);
-//             } else if (isDownMove(data->current_action)) {
-//                 shift = figure_is_attaching(data->current_action, TODO);
-//             }
-//             // else if (data->current_action == Pause) {
-//             //     data->currentState = STATE_PAUSE;
-//             // }
-//             if (shift == MY_OK && data->shift_timer.time_to_shift == true) {
-//                 data->current_state = STATE_SHIFT;
-//             }
-//             break;
-
-//         case STATE_SHIFT:
-//             data->current_action = Down;
-//             figure_is_attaching(data->current_action, TODO);
-//             data->shift_timer.time_to_shift = false;
-
-//             if (data->current_state != STATE_SPAWN) {
-//                 data->current_state = STATE_MOVEMENT;
-//             }
-//             data->current_action = NONE_ACTION;
-//             break;
-//         case STATE_PAUSE:
-
-//             break;
-
-//         case STATE_GAME_OVER:
-//             break;
-//         case STATE_EXIT:
-//             data->current_action = Terminate;
-//             free_game();
-//             exit(EXIT_SUCCESS);
-//             break;
-//     }
-// }
 
 void finish_game(TetrisData_t *data) {
     if (data->current_state != STATE_GAME_OVER && !data->is_win)
         data->is_active = false;
-     free_game(data);
+     data->current_state=STATE_EXIT;
 }
 
 void reset_game(TetrisData_t *data) {

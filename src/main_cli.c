@@ -6,7 +6,7 @@ void start_game(int choice) {
   endwin();  // завершили текущую ncurses-сессию
   switch (choice) {
     case 1:
-      system("./build/main_tetris");
+      system("./t");
       init_nc();
       break;
     case 2:
@@ -21,11 +21,11 @@ int main() {
   // init_game_data();
   int choice = 1;
   init_nc();
-  get_game_wins();
+   get_game_wins();
 
   while (choice) {
     choice =
-        handle_menu(TODO);  // frontend, с него получаем сигнал, который выбрал
+        handle_menu(get_game_wins());  // frontend, с него получаем сигнал, который выбрал
     // cleanup_game_wins();
     // пользователь
     if (choice) {
@@ -35,7 +35,7 @@ int main() {
       break;
     }
   }
-  terminate_ncurses();
+  terminate_ncurses(get_game_wins());
   printf("%d", choice);
   return EXIT_SUCCESS;
 }

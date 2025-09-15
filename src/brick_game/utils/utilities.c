@@ -149,3 +149,34 @@ int findIndex(const int array[], int size, int i) {
 int get_min(const int a, const int b) { return a > b ? b : a; }
 
 int get_max(const int a, const int b) { return a < b ? b : a; }
+int get_highScore() {
+  int h_score = 0;
+  // return 100;
+  char* filename = "highscore.txt";
+  int size = 1000;
+  // буфер для считавания данных из файла
+  char buffer[size];
+  // чтение из файла
+  FILE* fp = fopen(filename, "r");
+  if (fp) {
+    // пока не дойдем до конца, считываем по 256 байт
+    fgets(buffer, size, fp);
+    h_score = atoi(buffer);
+    fclose(fp);
+  }
+  return h_score;
+};
+
+void write_high_score(int h_score) {
+  char* filename = "highscore.txt";
+
+  int size = 1000;
+  char buffer[size];
+
+  FILE* fp = fopen(filename, "w");
+  if (fp) {
+    sprintf(buffer, "%d", h_score);
+    fputs(buffer, fp);
+    fclose(fp);
+  }
+}

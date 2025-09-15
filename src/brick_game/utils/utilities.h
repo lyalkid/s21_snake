@@ -106,4 +106,21 @@ int get_max(int a, int b);
  * @return Индекс первого вхождения или -1 если не найдено.
  */
 int findIndex(const int array[], int size, int i);
+/**
+ * @brief Получает рекорд из файла.
+ *
+ * @return Текущий рекорд (0 если файл недоступен).
+ *
+ * @note Файл: "highscore.txt" в рабочей директории.
+ */
+int get_highScore();
+
+/**
+ * @brief Записывает новый рекорд в файл.
+ *
+ * @param h_score Новое значение рекорда.
+ *
+ * @note Файл: "highscore.txt" в рабочей директории.
+ */
+void write_high_score(int h_score);
 #endif  // UTILITIES_H

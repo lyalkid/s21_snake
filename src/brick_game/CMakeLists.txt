@@ -7,7 +7,6 @@ add_library(brick_game STATIC
         tetris/src/field_mechanics.c
         tetris/src/game_rules.c
         tetris/src/game_state_management.c
-        tetris/src/storage.c
         tetris/src/tetramino.c
         tetris/src/tetramino_movement.c
         snake/Snake.cpp

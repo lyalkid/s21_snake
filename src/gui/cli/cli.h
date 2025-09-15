@@ -45,7 +45,7 @@ int handle_menu(Game_wins_t *t_wins) ;
 void print_menu(WINDOW *menu_win, int highlight, const char **choices);
 void init_menu(Game_wins_t *t_wins);
 void set_title(WINDOW* title_win, char* title);
-// Game_wins_t* get_game_wins() ;
+Game_wins_t* get_game_wins() ;
 void cleanup_game_wins();
 Game_wins_t init_tetris_wins();
 Game_wins_t* get_tetris_wins();

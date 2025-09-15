@@ -9,7 +9,6 @@ add_executable(snake-tetris
         brick_game/tetris/src/field_mechanics.c
         brick_game/tetris/src/game_rules.c
         brick_game/tetris/src/game_state_management.c
-        brick_game/tetris/src/storage.c
         brick_game/tetris/src/tetramino.c
         brick_game/tetris/src/tetramino_movement.c
         brick_game/utils/utilities.c

@@ -13,7 +13,12 @@ T_CLI_OBJ = $(T_CLI_SRC:.c=.o)
 T_LIB = libtetris.a
 T_CLI = libtcli.a
 
-all: $(T_LIB) $(T_CLI)
+all: $(T_LIB) main
+	gcc main_tetris.c -L. libtetris.a libtcli.a -lncurses -lm -o t
+	./main
+
+main:$(T_CLI)
+	gcc main_cli.c -L. libtcli.a -lncurses -o main
 
 style:
 	clang-format --style=Google -i $(TETRIS_SRC) $(T_CLI_SRC)

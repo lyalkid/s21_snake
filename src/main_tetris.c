@@ -69,7 +69,6 @@ void game_loop(Game_wins_t *t_wins) {
         }
     }
 
-    free_game(data);
 }
 
 

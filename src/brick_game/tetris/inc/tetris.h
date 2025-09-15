@@ -279,23 +279,7 @@ int check_collision(Tetramino tetraMino, int **field);
  */
 int canMergeFigures(int **field, int **next);
 
-/**
- * @brief Получает рекорд из файла.
- *
- * @return Текущий рекорд (0 если файл недоступен).
- *
- * @note Файл: "highscore.txt" в рабочей директории.
- */
-int get_highScore();
 
-/**
- * @brief Записывает новый рекорд в файл.
- *
- * @param h_score Новое значение рекорда.
- *
- * @note Файл: "highscore.txt" в рабочей директории.
- */
-void write_high_score(int h_score);
 
 
 

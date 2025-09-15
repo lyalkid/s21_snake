@@ -23,10 +23,11 @@
 //   return game_info;
 // }
 
+
 GameInfo_t init_empty_gameInfo(void) {
   GameInfo_t gameInfo;
   gameInfo.score = 0;
-  gameInfo.high_score = 0;
+  gameInfo.high_score = get_highScore();
   gameInfo.level = 0;
   gameInfo.pause = 0;
   gameInfo.speed = 0;

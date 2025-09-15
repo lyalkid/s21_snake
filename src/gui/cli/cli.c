@@ -79,16 +79,16 @@ void terminate_ncurses(Game_wins_t* t_wins) {
 //   }
 //   return t_wins;
 // }
-// Game_wins_t* get_game_wins() {
-//   static Game_wins_t* game_wins;
-//   if (game_wins == NULL) {
-//     game_wins = malloc(sizeof(Game_wins_t));
-//     game_wins->next_win = newwin(3, 25, 1, 1);
-//     game_wins->game_win = newwin(15, 25, 4, 1);
-//     game_wins->info_win = newwin(15, 25, 4, 26);
-//   }
-//   return game_wins;
-// }
+Game_wins_t* get_game_wins() {
+  static Game_wins_t* game_wins;
+  if (game_wins == NULL) {
+    game_wins = malloc(sizeof(Game_wins_t));
+    game_wins->next_win = newwin(3, 25, 1, 1);
+    game_wins->game_win = newwin(15, 25, 4, 1);
+    game_wins->info_win = newwin(15, 25, 4, 26);
+  }
+  return game_wins;
+}
 // void cleanup_game_wins() {
 //   Game_wins_t* game_wins = get_game_wins();
 //   if (game_wins != NULL) {
