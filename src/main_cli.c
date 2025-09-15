@@ -24,7 +24,8 @@ int main() {
   get_game_wins();
 
   while (choice) {
-    choice = handle_menu();  // frontend, с него получаем сигнал, который выбрал
+    choice =
+        handle_menu(TODO);  // frontend, с него получаем сигнал, который выбрал
     // cleanup_game_wins();
     // пользователь
     if (choice) {

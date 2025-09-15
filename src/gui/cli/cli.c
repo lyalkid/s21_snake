@@ -15,7 +15,7 @@ void init_nc() {
 
   init_colors();
 
-  nodelay(stdscr, TRUE);
+  nodelay(stdscr  , TRUE);
   keypad(stdscr, TRUE);
   curs_set(0);
   timeout(0);
@@ -26,13 +26,13 @@ void init_nc() {
 /**
  * @brief Двигает фигуру влево.
  */
-Tetris_wins_t init_tetris_wins() {
-  Tetris_wins_t t_wins = {};
+Game_wins_t init_tetris_wins() {
+  Game_wins_t t_wins = {};
   getmaxyx(stdscr, t_wins.yMax, t_wins.xMax);
   // delwin(t_wins.game_win);
   return t_wins;
 }
-void set_tetris_wins(Tetris_wins_t* t_wins) {
+void set_tetris_wins(Game_wins_t* t_wins) {
   t_wins->game_win = newwin(FIELD_Y, FIELD_X, 0, 0);
   t_wins->info_win = newwin(INFO_Y - 2, INFO_X, 0, FIELD_X);
   t_wins->next_win = newwin(NEXT_Y + 2, NEXT_X, INFO_Y - 2, FIELD_X);
@@ -60,62 +60,63 @@ void init_colors() {
   init_pair(7, COLOR_BLACK, COLOR_MAGENTA);
 }
 
-void terminate_ncurses() {
-  cleanup_game_wins();
+void terminate_ncurses(Game_wins_t* t_wins) {
+  refresh();
+  delwin(t_wins->game_win);
+  delwin(t_wins->info_win);
+  delwin(t_wins->next_win);
   clearok(stdscr, TRUE);  // Устанавливаем флаг перерисовки экрана
   clear();  // Очищаем экран
-  refresh();
-  refresh();
   endwin();
 }
 
-Tetris_wins_t* get_tetris_wins() {
-  static Tetris_wins_t* t_wins;
-  if (t_wins == NULL) {
-    t_wins = malloc(sizeof(Tetris_wins_t));
-    t_wins->xMax = 0;
-    t_wins->yMax = 0;
-  }
-  return t_wins;
-}
-Game_wins_t* get_game_wins() {
-  static Game_wins_t* game_wins;
-  if (game_wins == NULL) {
-    game_wins = malloc(sizeof(Game_wins_t));
-    game_wins->title_win = newwin(3, 25, 1, 1);
-    game_wins->menu_win = newwin(15, 25, 4, 1);
-    game_wins->info_win = newwin(15, 25, 4, 26);
-  }
-  return game_wins;
-}
-void cleanup_game_wins() {
-  Game_wins_t* game_wins = get_game_wins();
-  if (game_wins != NULL) {
-    if (game_wins->title_win != NULL) {
-      delwin(game_wins->title_win);
-    }
-    if (game_wins->menu_win != NULL) {
-      delwin(game_wins->menu_win);
-    }
-    if (game_wins->info_win != NULL) {
-      delwin(game_wins->info_win);
-    }
+// Game_wins_t* get_tetris_wins() {
+//   static Game_wins_t* t_wins;
+//   if (t_wins == NULL) {
+//     t_wins = malloc(sizeof(Game_wins_t));
+//     t_wins->xMax = 0;
+//     t_wins->yMax = 0;
+//   }
+//   return t_wins;
+// }
+// Game_wins_t* get_game_wins() {
+//   static Game_wins_t* game_wins;
+//   if (game_wins == NULL) {
+//     game_wins = malloc(sizeof(Game_wins_t));
+//     game_wins->next_win = newwin(3, 25, 1, 1);
+//     game_wins->game_win = newwin(15, 25, 4, 1);
+//     game_wins->info_win = newwin(15, 25, 4, 26);
+//   }
+//   return game_wins;
+// }
+// void cleanup_game_wins() {
+//   Game_wins_t* game_wins = get_game_wins();
+//   if (game_wins != NULL) {
+//     if (game_wins->next_win != NULL) {
+//       delwin(game_wins->next_win);
+//     }
+//     if (game_wins->game_win != NULL) {
+//       delwin(game_wins->game_win);
+//     }
+//     if (game_wins->info_win != NULL) {
+//       delwin(game_wins->info_win);
+//     }
+//
+//     free(game_wins);
+//   }
+// }
 
-    free(game_wins);
-  }
-}
-
-int handle_menu() {
+int handle_menu(Game_wins_t* t_wins) {
   const char* list[ITEMS] = {"exit", "tetris", "snake"};
 
-  init_menu();
+  init_menu(t_wins);
   int highlight = 0;
   int choice = 0;
   int c = 0;
   while (1) {
     timeout(100000);
-    print_menu(get_game_wins()->menu_win, highlight, list);
-    c = wgetch(get_game_wins()->menu_win);
+    print_menu(t_wins->game_win, highlight, list);
+    c = wgetch(t_wins->game_win);
     if (c == KEY_UP || c == CONTROL_UP) {
       highlight--;
       if (highlight < 0) highlight = ITEMS - 1;
@@ -136,40 +137,40 @@ int handle_menu() {
   return choice;
 }
 
-void init_menu() {
+void init_menu(Game_wins_t* t_wins) {
   curs_set(0);
-  WINDOW* title_win = get_game_wins()->title_win;
-  WINDOW* menu_win = get_game_wins()->menu_win;
-  WINDOW* info_win = get_game_wins()->info_win;
-  keypad(menu_win, TRUE);
-  set_title(title_win, "BRICKGAME");
+  WINDOW* next_win = t_wins->next_win;
+  WINDOW* game_win = t_wins->game_win;
+  WINDOW* info_win = t_wins->info_win;
+  keypad(game_win, TRUE);
+  set_title(next_win, "BRICKGAME");
   // refresh();
-  box(menu_win, 0, 0);
-  box(title_win, 0, 0);
+  box(game_win, 0, 0);
+  box(next_win, 0, 0);
   box(info_win, 0, 0);
-  wrefresh(menu_win);
-  wrefresh(title_win);
+  wrefresh(game_win);
+  wrefresh(next_win);
   wrefresh(info_win);
 }
 
-void set_title(WINDOW* title_win, char* title) {
-  werase(title_win);
-  mvwprintw(title_win, 1, 8, "%s", title);
+void set_title(WINDOW* next_win, char* title) {
+  werase(next_win);
+  mvwprintw(next_win, 1, 8, "%s", title);
 }
 
-void print_menu(WINDOW* menu_win, int highlight, const char** choices) {
+void print_menu(WINDOW* game_win, int highlight, const char** choices) {
   int x = 2, y = 2;
-  box(menu_win, 0, 0);
+  box(game_win, 0, 0);
 
   for (int i = 0; i < ITEMS; ++i) {
     if (highlight == i) {
-      wattron(menu_win, A_REVERSE);
-      mvwprintw(menu_win, y, x, "%s", choices[i]);
-      wattroff(menu_win, A_REVERSE);
+      wattron(game_win, A_REVERSE);
+      mvwprintw(game_win, y, x, "%s", choices[i]);
+      wattroff(game_win, A_REVERSE);
     } else {
-      mvwprintw(menu_win, y, x, "%s", choices[i]);
+      mvwprintw(game_win, y, x, "%s", choices[i]);
     }
     y++;
   }
-  wrefresh(menu_win);
+  wrefresh(game_win);
 }

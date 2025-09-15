@@ -7,7 +7,6 @@
 
 #include "../../utils/defines.h"
 #include "../../utils/utilities.h"
-#include "../game_api/game_api.h"
 #include "../inc/tetris.h"
 int piece_str_to_type(const char *piece) {
   if (strcmp(piece, "I") == 0) return I;

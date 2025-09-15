@@ -11,12 +11,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include <stdbool.h>
 #include "../../brick_game.h"
 #include "../../utils/defines.h"
 #include "../../utils/utilities.h"
+#include "timer.h"
 
 enum answer { YES, NO };
+
 /** Статусы функций. */
 enum status { ERROR, MY_OK };
 
@@ -36,12 +38,13 @@ enum degrees { COMPLETE, RIGHT, STRAIGHT, REFLEX };
  * @field history История последних фигур (4 элемента).
  */
 typedef struct {
-  const char *pieces[7];
-  const char *pool[35];
-  const char *order[7];
-  int order_size;
-  const char *history[4];
+    int order_size;
+    const char *history[4];
+    const char *pieces[7];
+    const char *order[7];
+    const char *pool[35];
 } TGM3Randomizer;
+
 /**
  * @brief Структура тетрамино.
  *
@@ -55,14 +58,14 @@ typedef struct {
  */
 
 typedef struct {
-  int type;
-  int next_type;
-  int rotate;
-  int center_x;
-  int center_y;
-  int coordinates[8];
-  int **tmp_current_figure_on_field;
-  TGM3Randomizer r;
+    int type;
+    int next_type;
+    int rotate;
+    int center_x;
+    int center_y;
+    int coordinates[8];
+    int **tmp_current_figure_on_field;
+    TGM3Randomizer r;
 } Tetramino;
 
 /**
@@ -110,9 +113,11 @@ int contains(const char *arr[], int size, const char *value);
  * @return Индекс или -1, если не найдено
  */
 int index_of(const char *arr[], int size, const char *value);
+
 void next_tetramino(TGM3Randomizer *r);
 
 void print_tetramino(Tetramino tetramino);
+
 /**
  * @brief Преобразует фигуру в 2D-массив.
  *
@@ -120,6 +125,7 @@ void print_tetramino(Tetramino tetramino);
  * @param next Целевой массив.
  */
 void placeTetraminoInArray(Tetramino tetraMino, int **next);
+
 /**
  * @brief Копирует координаты фигуры.
  *
@@ -127,6 +133,7 @@ void placeTetraminoInArray(Tetramino tetraMino, int **next);
  * @param values Исходные координаты.
  */
 void setCoordinates(int *coordinates, const int *values);
+
 /**
  * @brief Генерирует координаты фигуры по типу и углу.
  *
@@ -135,6 +142,7 @@ void setCoordinates(int *coordinates, const int *values);
  * @param type Тип фигуры (T, J, L, I, S, Z, O).
  */
 void generateTetraminoShape(int coordinates[], int rotate, int type);
+
 /**
  * @brief Генерирует координаты фигуры по типу и углу.
  *
@@ -143,6 +151,7 @@ void generateTetraminoShape(int coordinates[], int rotate, int type);
  * @param type Тип фигуры (T, J, L, I, S, Z, O).
  */
 void generateShapeSZorI(int coordinates[], int rotate, int type);
+
 /**
  * @brief Генерирует координаты фигуры по типу и углу.
  *
@@ -172,6 +181,7 @@ void spawnNextTetramino(Tetramino *tetraMino);
  * @details Удаляет строки и сдвигает поле вниз.
  */
 int removeFullLines(int **field, int rows, int cols);
+
 /**
  * @brief Проверяет, заполнена ли строка.
  *
@@ -180,6 +190,7 @@ int removeFullLines(int **field, int rows, int cols);
  * @return 1 (YES) если заполнена, иначе 0.
  */
 int isLineFull(const int a[], int size);
+
 /**
  * @brief Удаляет строку и сдвигает поле.
  *
@@ -196,6 +207,7 @@ void removeLine(int **field, int cols, int row_not);
  * @return Количество очков.
  */
 int calc_score(int lines);
+
 /**
  * @brief Вычисляет текущий уровень игры на основе счета.
  *
@@ -206,7 +218,40 @@ int calc_score(int lines);
  */
 int calc_level(int current_score);
 
+
+typedef enum {
+    STATE_INITIALIZE,
+    STATE_SPAWN,
+    STATE_MOVEMENT ,
+
+    STATE_SHIFT,
+    STATE_PAUSE,
+    STATE_GAME_OVER,
+    STATE_EXIT
+}Tetris_state_t;
+
+/**
+ * @brief Структура для хранения игровой информации
+ * @field currenState - текущее состоянии
+ * @field shift_timer - таймер для управления скоростью
+ * @field current_tetraMino - текущая фигура
+ * @field current_game_info - текущее состояние игры
+ */
+typedef struct {
+    bool is_active;
+    bool is_win;
+    bool changed;
+    UserAction_t current_action;
+    Tetris_state_t current_state;
+    // Tetris_state_t prev_state;
+    Shift_timer shift_timer;
+    Tetramino current_tetraMino;
+    GameInfo_t current_game_info;
+}TetrisData_t;
+
+void game_mechanics(TetrisData_t* data);
 GameInfo_t init_empty_gameInfo(void);
+
 /**
  * @brief Объединяет поле с фигурой.
  *
@@ -215,6 +260,7 @@ GameInfo_t init_empty_gameInfo(void);
  * @return 1 (MY_OK) если объединение успешно, 0 (ERROR) при коллизии.
  */
 int mergeFigureIntoField(int **next, int **field);
+
 /**
  * @brief Проверяет коллизию фигуры с игровым полем.
  *
@@ -223,6 +269,7 @@ int mergeFigureIntoField(int **next, int **field);
  * @return 1 (MY_OK) если коллизий нет, 0 (ERROR) при коллизии.
  */
 int check_collision(Tetramino tetraMino, int **field);
+
 /**
  * @brief Проверяет коллизию поля и фигуры.
  *
@@ -240,6 +287,7 @@ int canMergeFigures(int **field, int **next);
  * @note Файл: "highscore.txt" в рабочей директории.
  */
 int get_highScore();
+
 /**
  * @brief Записывает новый рекорд в файл.
  *
@@ -248,5 +296,39 @@ int get_highScore();
  * @note Файл: "highscore.txt" в рабочей директории.
  */
 void write_high_score(int h_score);
+
+
+
+
+
+TetrisData_t *get_data(void);
+TetrisData_t init_empty_data(void);
+
+const char* stateToString(Tetris_state_t s);
+const char *actionToString(UserAction_t s) ;
+void main_fsm(TetrisData_t *data, UserAction_t action);
+void game_fsm(TetrisData_t *data);
+void finish_game(TetrisData_t *data);
+void reset_game(TetrisData_t *data);
+void free_game(TetrisData_t *data);
+
+void userInput(UserAction_t action, bool hold);
+void onMoving(UserAction_t action);
+
+void onStart(TetrisData_t* data);
+int figure_is_attaching(UserAction_t action, TetrisData_t *data) ;
+void attach_tetramino(TetrisData_t *data);
+
+/**
+ * @brief пытается создать новую фигуру, возвращает MY_OK или ERROR
+ * @param tetraMino фигура
+ * @param game_info структура игры
+ * @return
+ */
+int spawn_figure(Tetramino *tetraMino, GameInfo_t *game_info);
+void is_game_over(int* state, int status);
+int onShifting(void);
+GameInfo_t updateCurrentState();
+
 
 #endif  // TETRIS_H

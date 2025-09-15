@@ -27,26 +27,26 @@ typedef struct {
     WINDOW* game_win;
     WINDOW* info_win;
     WINDOW* next_win;
-} Tetris_wins_t;
+} Game_wins_t;
 
-typedef struct {
-    WINDOW* title_win;
-    WINDOW* menu_win;
-    WINDOW* info_win;
-}Game_wins_t;
+// typedef struct {
+//     WINDOW* title_win;
+//     WINDOW* menu_win;
+//     WINDOW* info_win;
+// }Game_wins_t;
 
 
 void init_nc();
-void set_tetris_wins(Tetris_wins_t* views);
+void set_tetris_wins(Game_wins_t* views);
 void init_colors();
-void terminate_ncurses();
+void terminate_ncurses(Game_wins_t *t_wins);
 
-int handle_menu() ;
+int handle_menu(Game_wins_t *t_wins) ;
 void print_menu(WINDOW *menu_win, int highlight, const char **choices);
-void init_menu();
+void init_menu(Game_wins_t *t_wins);
 void set_title(WINDOW* title_win, char* title);
-Game_wins_t* get_game_wins() ;
+// Game_wins_t* get_game_wins() ;
 void cleanup_game_wins();
-Tetris_wins_t init_tetris_wins();
-Tetris_wins_t* get_tetris_wins();
+Game_wins_t init_tetris_wins();
+Game_wins_t* get_tetris_wins();
 #endif //CLI_H

@@ -7,11 +7,31 @@
 
 #include "frontend.h"
 
-#include "../../../brick_game/tetris/game_api/game_api.h"
+#include "../../../brick_game/tetris/inc/tetris.h"
 #include "../cli.h"
+void draw(TetrisData_t *data, Game_wins_t *t_wins) {
+  Tetris_state_t c_state = data->current_state;
+  if (c_state == STATE_INITIALIZE || c_state == STATE_PAUSE ||
+      c_state == STATE_GAME_OVER) {
+    draw_static(c_state, t_wins);
 
-void draw_tetris(GameInfo_t currentState, Tetramino t) {
-  Tetris_wins_t *t_wins = get_tetris_wins();
+  } else {
+    if (data->changed){
+      draw_tetris(data->current_game_info, data->current_tetraMino, t_wins);
+      data->changed = false;
+    }
+  }
+}
+void draw_static(int state, Game_wins_t *t_wins) {
+  if (state == STATE_INITIALIZE) {
+    render_welcome_tetris(t_wins);
+  } else if (state == STATE_PAUSE) {
+    render_pause(t_wins->game_win);
+  } else if (state == STATE_GAME_OVER) {
+    render_game_over(t_wins->game_win);
+  }
+}
+void draw_tetris(GameInfo_t currentState, Tetramino t, Game_wins_t *t_wins) {
   render_game_win(t_wins->game_win, currentState.field,
                   t.tmp_current_figure_on_field);
   render_info_win(t_wins->info_win, currentState.high_score, currentState.score,
@@ -28,11 +48,11 @@ void render_game_win(WINDOW *win, int **field, int **next) {
       if ((res != 0 && field[i][j] == 0) || field[i][j] != 0) {
         wattron(win, COLOR_PAIR(res));
 
-        mvwprintw(win, i + 1, j * scale_field + 1, "[]");
+        mvwprintw(win, i + 1, j * scale_field + 1, "  ");
 
         wattroff(win, COLOR_PAIR(res));
       } else {
-        mvwprintw(win, i + 1, j * scale_field + 1, "- ");
+        mvwprintw(win, i + 1, j * scale_field + 1, "  ");
       }
     }
   }
@@ -72,7 +92,7 @@ void render_next_win(WINDOW *next_win, int type) {
 void render_info_win(WINDOW *info_win, int h_score, int score, int level) {
   werase(info_win);
 
-  int stat_w = 7 * 2, stat_h = 1;
+  // int stat_w = 7 * 2, stat_h = 1;
   wattron(info_win, COLOR_PAIR(4));
   mvwprintw(info_win, 1, 2, "high_score:");
   mvwprintw(info_win, 2, 2, "%d", h_score > score ? h_score : score);
@@ -133,16 +153,7 @@ char piece(int type) {
   return r;
 }
 
-void draw_static(int state, Tetris_wins_t *t_wins) {
-  if (state == STATE_START) {
-    print_welcome_tetris(t_wins);
-  } else if (state == STATE_PAUSE) {
-    render_pause(t_wins->game_win);
-  } else if (state == STATE_GAME_OVER) {
-    render_game_over(t_wins->game_win);
-  }
-}
-void print_welcome_tetris(Tetris_wins_t *t_wins) {
+void render_welcome_tetris(Game_wins_t *t_wins) {
   WINDOW *main_menu_win = t_wins->game_win;
   werase(main_menu_win);
   mvwprintw(main_menu_win, 1, WIDTH / 2, "HELLO ");

@@ -5,6 +5,8 @@
  *
  */
 
+#include <math.h>
+
 #include "../inc/tetris.h"
 int calc_score(int lines) {
   int res = 0;
@@ -29,4 +31,16 @@ int calc_score(int lines) {
 int calc_level(int current_score) {
   int res = current_score / 600;
   return res > 10 ? 10 : res;
+}
+
+void game_mechanics(TetrisData_t* data) {
+  GameInfo_t* game_info = &data->current_game_info;
+  // calc score
+  game_info->score +=
+      calc_score(removeFullLines(game_info->field, HEIGHT, WIDTH));
+  game_info->level = calc_level(game_info->score);
+  game_info->speed = TIME * pow(0.9, game_info->level);
+  data->shift_timer.delay_to_shift = (long)game_info->speed;
+
+  if (game_info->level == 10) data->is_win = true;
 }

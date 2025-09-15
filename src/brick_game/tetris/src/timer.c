@@ -4,7 +4,7 @@
  * @details
  *
  */
-#include "../inc/Timer.h"
+#include "../inc/timer.h"
 
 int is_time_to_shift(time_val before, time_val after, long timer) {
   long res = (after.tv_sec * 1000000 + after.tv_usec) -
