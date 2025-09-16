@@ -278,13 +278,6 @@ int check_collision(Tetramino tetraMino, int **field);
  * @return 1 если коллизии нет, иначе 0.
  */
 int canMergeFigures(int **field, int **next);
-
-
-
-
-
-
-
 TetrisData_t *get_data(void);
 TetrisData_t init_empty_data(void);
 

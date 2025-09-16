@@ -97,6 +97,7 @@ const char *actionToString(UserAction_t s) {
 void userInput(UserAction_t action, bool hold) {
     TetrisData_t *data = get_data();
     main_fsm(data, action);
+    countTime(&data->shift_timer);
     if (hold)
         hold = true;
     else
