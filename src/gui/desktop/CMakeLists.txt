@@ -38,9 +38,6 @@ else()
     else()
         add_executable(desktop
                 ${PROJECT_SOURCES}
-                tetriswidget.h tetriswidget.cpp
-                ../../brick_game/tetris/src/field_mechanics.c ../../brick_game/tetris/src/game_api.c ../../brick_game/tetris/src/game_rules.c ../../brick_game/tetris/src/game_state_management.c ../../brick_game/tetris/src/tetramino.c ../../brick_game/tetris/src/tetramino_movement.c ../../brick_game/tetris/src/TGM3Randomizer.c ../../brick_game/tetris/src/timer.c
-                ../../brick_game/tetris/inc/tetramino_movement.h ../../brick_game/tetris/inc/tetris.h ../../brick_game/tetris/inc/timer.h
         )
     endif()
 endif()
@@ -53,6 +50,7 @@ target_include_directories(desktop PRIVATE
 )
 
 target_link_libraries(desktop PRIVATE
+        brick_game
         Qt${QT_VERSION_MAJOR}::Widgets
 )
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
