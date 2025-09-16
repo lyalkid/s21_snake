@@ -32,26 +32,48 @@ void MainWindow::paintEvent(QPaintEvent *e) {
     GameInfo_t inf = updateCurrentState();
     int** field = inf.field;
     int** next = get_data()->current_tetraMino.tmp_current_figure_on_field;
-    for (int i = 0; i < HEIGHT; i++) {
-        for (int j = 0; j < WIDTH; j++) {
-            int res = field[i][j] + next[i][j];
-            if ((res != 0 && field[i][j] == 0) || field[i][j] != 0) {
-                printf("[]");
-            } else {
-                printf("  ");
-            }
-        }
-        printf("\n");
-    }
+//     if(get_data()->current_state == STATE_SPAWN){
+// system("clear");
+//     }
+//     for (int i = 0; i < HEIGHT; i++) {
+//         for (int j = 0; j < WIDTH; j++) {
+//             int res = field[i][j] + next[i][j];
+//             if ((res != 0 && field[i][j] == 0) || field[i][j] != 0) {
+//                 printf("[]");
+//             } else {
+//                 printf("  ");
+//             }
+//         }
+//         printf("\n");
+//     }
     ;
     int size = 20;
     for (int i{}; i < 20; ++i) {
         for (int j{}; j < 10; ++j) {
             int res = field[i][j] + next[i][j];
-            if ((res != 0 && field[i][j] == 0) || field[i][j] != 0) {
+            if (!((res != 0 && field[i][j] == 0) || field[i][j] != 0)) {
                 p.setBrush(Qt::black);
-            } else {
+            }
+            else if(res == 1){
+p.setBrush(Qt::red);
+            } 
+            else if(res == 2){
+                p.setBrush(Qt::cyan);
+            }
+             else if(res == 3){
+                p.setBrush(Qt::blue);
+            }
+             else if(res == 4){
+                p.setBrush(Qt::yellow);
+            }
+             else if(res == 5){
                 p.setBrush(Qt::white);
+            }
+             else if(res == 6){
+                p.setBrush(Qt::green);
+            }
+            else if(res == 7) {
+                p.setBrush(Qt::magenta);
             }
             p.drawRect(size * j, size * i, size, size);
         }
