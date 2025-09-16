@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#define TIME 125000  // 2 seconds
+#define TIME 1000000  // 2 seconds
 
 typedef struct {
   long tv_sec;
