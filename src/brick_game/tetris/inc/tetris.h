@@ -281,10 +281,6 @@ int canMergeFigures(int **field, int **next);
 
 
 
-
-
-
-
 TetrisData_t *get_data(void);
 TetrisData_t init_empty_data(void);
 
