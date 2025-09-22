@@ -52,9 +52,10 @@ namespace s21 {
         }
         if (info.score != model->score) {
             if (info.score % 5 == 0) {
-                info.level += 1;
-                // info.speed = TIME * pow(0.9, info.level);
-                // timer.delay_to_shift = (long) (info.speed);
+                if (info.level != 10)  {info.level += 1;
+                    info.speed = TIME * pow(0.9, info.level);
+                    timer.delay_to_shift = (long) (info.speed);
+                }
             }
             info.score = model->score;
         }

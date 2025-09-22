@@ -45,20 +45,22 @@ const char *actionToString(UserAction_t s) {
     return "none_action";
 }
 
-void debug_info(UserAction_t action, Vec2 dir, Vec2 head, bool shift, Vec2 body[], int score) {
+void debug_info_snake(UserAction_t action, Vec2 dir, Vec2 head, bool shift, Vec2 body[], int score, int speed) {
     mvprintw(0, 22, "action: %s", actionToString(action));
     mvprintw(1, 22, "dir:   ,   ");
     mvprintw(1, 22, "dir: %d, %d", dir.x, dir.y);
-    mvprintw(2, 22, "head:   ,   ");
-    mvprintw(2, 22, "head: %d, %d", head.x, head.y);
+    mvprintw(4, 22, "head:   ,   ");
+    mvprintw(4, 22, "head: %d, %d", head.x, head.y);
+    mvprintw(5, 22, "speed:    ");
+    mvprintw(5, 22, "speed: %d, ", speed);
     if (shift) {
-        mvprintw(3, 22, "time to shift!");
+        mvprintw(6, 22, "time to shift!");
     } else {
-        mvprintw(3, 22, "              ");
+        mvprintw(6, 22, "              ");
     }
-    for (int i = 0; i < score; i++) {
-        mvprintw(4 + i, 22, "body[%d]: %d, %d", i, body[i].x, body[i].y);
-    }
+    // for (int i = 0; i < score; i++) {
+    //     mvprintw(4 + i, 22, "body[%d]: %d, %d", i, body[i].x, body[i].y);
+    // }
 }
 
 void render_snake(WINDOW *win, int **field, int score, int h_score, int level) {
@@ -131,8 +133,8 @@ int main() {
         }
         action = getSignal(getch());
 
-        // debug_info(action, controller.get_model().getDirection(), controller.get_model().getHead(),
-        //            controller.timer.time_to_shift, controller.get_model().getBody(), controller.get_model().getScore());
+        // debug_info_snake(action, controller.get_model().getDirection(), controller.get_model().getHead(),
+        //                  controller.timer.time_to_shift, controller.get_model().getBody(), controller.get_model().getScore(), controller.get_game_info().speed);
 
         controller.userInput(action, true);
 
