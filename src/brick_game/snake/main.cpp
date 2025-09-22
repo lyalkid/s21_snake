@@ -61,13 +61,14 @@ void debug_info(UserAction_t action, Vec2 dir, Vec2 head, bool shift, Vec2 body[
     }
 }
 
-void render_snake(WINDOW *win, int **field, int score, int h_score) {
+void render_snake(WINDOW *win, int **field, int score, int h_score, int level) {
     werase(win);
     mvprintw(0,22, "score:    ");
     mvprintw(0,22, "score: %d", score);
     mvprintw(1,22, "h_score:    ");
     mvprintw(1,22, "h_score: %d", h_score);
-
+    mvprintw(2,22, "level:    ");
+    mvprintw(2,22, "level: %d", level);
     for (int i = 0; i < HEIGHT; i++) {
         for (int j = 0; j < WIDTH; j++) {
             int res = field[i][j];
@@ -101,7 +102,7 @@ void draw_snake(WINDOW *win, GameInfo_t info, Snake_state state ) {
             render_welcome(win);
             break;
         case GAME:
-            render_snake(win, info.field, info.score, info.high_score);
+            render_snake(win, info.field, info.score, info.high_score, info.level);
             break;
         case PAUSE:
             render_pause(win);

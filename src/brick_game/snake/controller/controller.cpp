@@ -11,7 +11,7 @@ extern "C" {
 }
 
 namespace s21 {
-    Controller::Controller(s21::Snake *snake) : paused(false), active(true), updated(false),win(false), model(snake) {
+    Controller::Controller(s21::Snake *snake) : paused(false), active(true), updated(false), win(false), model(snake) {
         info = init_empty_gameInfo(2);
         null_array(info.field, HEIGHT, WIDTH);
         timer = init_shift_timer();
@@ -50,14 +50,20 @@ namespace s21 {
                 }
             }
         }
-        info.score = model->score;
+        if (info.score != model->score) {
+            if (info.score % 5 == 0) {
+                info.level += 1;
+                // info.speed = TIME * pow(0.9, info.level);
+                // timer.delay_to_shift = (long) (info.speed);
+            }
+            info.score = model->score;
+        }
         if (info.score > info.high_score) {
             write_high_score(info.score, 2);
             info.high_score = info.score;
         }
         info.pause = !paused;
-        info.level = 1;
-        info.speed = 1;
+
         if (size == 200) {
             win = true;
             state = WON;
@@ -73,13 +79,14 @@ namespace s21 {
                 if (state == GAME_OVER || state == INIT || state == WON) {
                     active = true;
                     model->reset();
+                    info = init_empty_gameInfo(2);
                 }
                 state = GAME;
                 break;
 
             case Pause:
                 paused = !paused;
-                if (!paused) {state = GAME;}
+                if (!paused) { state = GAME; }
                 // state = PAUSE;
                 break;
 
