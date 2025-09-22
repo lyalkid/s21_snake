@@ -24,10 +24,10 @@
 // }
 
 
-GameInfo_t init_empty_gameInfo(void) {
+GameInfo_t init_empty_gameInfo(int type) {
   GameInfo_t gameInfo;
   gameInfo.score = 0;
-  gameInfo.high_score = get_highScore();
+  gameInfo.high_score = get_highScore(type);
   gameInfo.level = 0;
   gameInfo.pause = 0;
   gameInfo.speed = 0;
@@ -37,10 +37,10 @@ GameInfo_t init_empty_gameInfo(void) {
 }
 
 UserAction_t getSignal(int user_input) {
-  UserAction_t sig = NONE_ACTION;
-  if (user_input == 'f') {
+  UserAction_t sig = (UserAction_t)NONE_ACTION;
+  if (user_input == 'w') {
     sig = Up;
-  } else if (user_input == 'w') {
+  } else if (user_input == 'f' || user_input == '\n') {
     sig = Action;
   } else if (user_input == 's') {
     sig = Down;

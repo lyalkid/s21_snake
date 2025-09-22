@@ -8,11 +8,16 @@
 #include "utilities.h"
 
 #include "../tetris/inc/tetris.h"
+void out(int **field) {
+printf("------------\n" );
+  print_array(field);
+printf("------------\n" );
 
+}
 int **malloc_array(int rows, int cols) {
-  int **field = malloc(sizeof(int *) * rows);
+  int **field = (int**) malloc(sizeof(int *) * rows);
   for (int i = 0; i < rows; i++) {
-    field[i] = calloc(cols, sizeof(int));
+    field[i] =(int*) calloc(cols, sizeof(int));
   }
   null_array(field, rows, cols);
   return field;
@@ -67,38 +72,25 @@ int get_real_len_of_number(const int a[], int size) {
   return size - count;
 }
 
-void print_array(int **array, int max_x, int min_x) {
-  printf("max_x = %d, min_x = %d\n", max_x, min_x);
-  // system("clear");
-  for (int i = 0; i < WIDTH; i++) {
-    if (i <= max_x && i >= min_x) {
-      printf("# ");
-    } else {
-      printf("- ");
-    }
-  }
-  printf("\n");
-
+void print_array(int **array) {
   for (int i = 0; i < HEIGHT; i++) {
     for (int j = 0; j < WIDTH; j++) {
-      if (array[i][j]) {
-        printf("%c ", '*');
-      } else {
+      if (array[i][j] == 3) {
+        printf("%c ", '+');
+      }
+      else if (array[i][j] == 2) {
+        printf("%c ", 'o');
+      }
+      else if (array[i][j] == 1) {
+        printf("%c ", '@');
+      }
+      else {
         printf("  ");
       }
     }
-
     printf("\n");
   }
-  for (int i = 0; i < WIDTH; i++) {
-    if (i <= max_x && i >= min_x) {
-      printf("# ");
-    } else {
-      printf("- ");
-    }
-  }
   printf("\n");
-  printf("max_x = %d, min_x = %d\n", max_x, min_x);
 }
 
 void overlay_array(int **field, int **next, int max_x, int min_x) {
@@ -149,11 +141,17 @@ int findIndex(const int array[], int size, int i) {
 int get_min(const int a, const int b) { return a > b ? b : a; }
 
 int get_max(const int a, const int b) { return a < b ? b : a; }
-int get_highScore() {
+int get_highScore(int type) {
   int h_score = 0;
   // return 100;
-  char* filename = "highscore.txt";
-  int size = 1000;
+  const char* filename;
+
+  if (type == 1) {
+    filename = "highscore_tetris.txt";
+  } else {
+    filename = "highscore_snake.txt";
+  }
+  const int size = 1000;
   // буфер для считавания данных из файла
   char buffer[size];
   // чтение из файла
@@ -167,9 +165,13 @@ int get_highScore() {
   return h_score;
 };
 
-void write_high_score(int h_score) {
-  char* filename = "highscore.txt";
-
+void write_high_score(int h_score, int type) {
+  const char* filename;
+  if (type == 1) {
+    filename = "highscore_tetris.txt";
+  } else {
+    filename = "highscore_snake.txt";
+  }
   int size = 1000;
   char buffer[size];
 

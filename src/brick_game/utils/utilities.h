@@ -7,9 +7,13 @@
 
 #ifndef UTILITIES_H
 #define UTILITIES_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stdio.h>
 #include <stdlib.h>
-/**
+void out(int **field);
+ /**
  * @brief Выделяет память под 2D-массив.
  *
  * @param rows Строки.
@@ -77,7 +81,7 @@ int get_real_len_of_number(const int a[], int size);
  *   1 0 0 1 ...
  *   --------------------
  */
-void print_array(int **array, int max_x, int min_x);
+void print_array(int **array);
 
 void overlay_array(int **field, int **next, int max_x, int min_x);
 /**
@@ -106,6 +110,7 @@ int get_max(int a, int b);
  * @return Индекс первого вхождения или -1 если не найдено.
  */
 int findIndex(const int array[], int size, int i);
+
 /**
  * @brief Получает рекорд из файла.
  *
@@ -113,14 +118,18 @@ int findIndex(const int array[], int size, int i);
  *
  * @note Файл: "highscore.txt" в рабочей директории.
  */
-int get_highScore();
+int get_highScore(int type);
 
 /**
  * @brief Записывает новый рекорд в файл.
  *
  * @param h_score Новое значение рекорда.
+ * @param type
  *
  * @note Файл: "highscore.txt" в рабочей директории.
  */
-void write_high_score(int h_score);
+void write_high_score(int h_score, int type);
+#ifdef __cplusplus
+    }
+#endif
 #endif  // UTILITIES_H

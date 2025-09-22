@@ -1,7 +1,7 @@
 #include  <ncurses.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "brick_game/snake/Snake.h"
+#include "brick_game/snake/model/Snake.h"
 
 typedef struct {
     int x;
@@ -10,7 +10,7 @@ typedef struct {
 vec2;
 
 int main() {
-    int screen_width = 40, screen_height = 20;
+    int screen_width = 10, screen_height = 20;
     WINDOW *win = initscr();
     keypad(win, TRUE);
     nodelay(win, TRUE);
@@ -20,10 +20,9 @@ int main() {
     vec2 segments[200];
     vec2 head = {0, 0};
     vec2 dir = {1, 0};
-
-
     vec2 berry = {rand() % screen_width, rand() % screen_height};
     int score = 1;
+
     while (true) {
         int pressed = wgetch(win);
         if (pressed == KEY_LEFT) {
@@ -57,6 +56,10 @@ int main() {
 
         head.x += dir.x;
         head.y += dir.y;
+        if (head.x > screen_width * 2) head.x = head.x % screen_width;
+        if (head.x < 0) head.x = head.x + screen_width * 2;
+        if (head.y > screen_height * 2) head.y = head.y % screen_height;
+        if (head.y < 0) head.y = head.y + screen_height * 2;
 
 
         if (head.x == berry.x && head.y == berry.y) {
@@ -74,7 +77,7 @@ int main() {
                 mvaddch(segments[i].y, segments[i].x * 2, 'o');
             }
         }
-        // box(win, 0, 0);
+        box(win, 0, 0);
         usleep(125000);
     }
     endwin();

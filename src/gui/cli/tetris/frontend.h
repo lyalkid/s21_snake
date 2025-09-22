@@ -12,14 +12,13 @@
 #include "../../../brick_game/tetris/inc/tetris.h"
 #include "../cli.h"
 void  draw_tetris(GameInfo_t currentState, Tetramino t, Game_wins_t *t_wins);
-void render_pause(WINDOW* game_win);
-void render_game_over(WINDOW* game_win);
+
 void render_game_win(WINDOW *win, int **field, int **next) ;
 void render_next_win(WINDOW* next_win, int type);
 void render_info_win(WINDOW* info_win, int h_score, int score, int level);
 void draw(TetrisData_t* data, Game_wins_t *t_wins);
 void draw_static(int state, Game_wins_t* t_wins) ;
-void render_welcome_tetris(Game_wins_t* t_wins);
+
 
 
 

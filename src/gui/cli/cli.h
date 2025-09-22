@@ -13,8 +13,13 @@
 #else
 #include <ncurses.h>
 #endif
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 # include "../../brick_game/brick_game.h"
 #include "../../brick_game/tetris/inc/tetris.h"
+
 
 
 #define ITEMS 3
@@ -29,12 +34,6 @@ typedef struct {
     WINDOW* next_win;
 } Game_wins_t;
 
-// typedef struct {
-//     WINDOW* title_win;
-//     WINDOW* menu_win;
-//     WINDOW* info_win;
-// }Game_wins_t;
-
 
 void init_nc();
 void set_tetris_wins(Game_wins_t* views);
@@ -44,9 +43,14 @@ void terminate_ncurses(Game_wins_t *t_wins);
 int handle_menu(Game_wins_t *t_wins) ;
 void print_menu(WINDOW *menu_win, int highlight, const char **choices);
 void init_menu(Game_wins_t *t_wins);
-void set_title(WINDOW* title_win, char* title);
-Game_wins_t* get_game_wins() ;
-void cleanup_game_wins();
+void set_title(WINDOW* title_win, const char* title);
+Game_wins_t* get_game_wins();
 Game_wins_t init_tetris_wins();
-Game_wins_t* get_tetris_wins();
+void render_pause(WINDOW* game_win);
+void render_game_over(WINDOW* game_win);
+void render_celebration(WINDOW* win);
+void render_welcome(WINDOW* gamewin);
+#ifdef __cplusplus
+}
+#endif
 #endif //CLI_H

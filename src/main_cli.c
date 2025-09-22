@@ -10,7 +10,7 @@ void start_game(int choice) {
       init_nc();
       break;
     case 2:
-      // system("./bin/s_cli");
+       system("./brick_game/snake/main_snake");
       break;
     default:
       break;

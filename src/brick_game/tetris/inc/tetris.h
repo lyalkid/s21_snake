@@ -15,7 +15,7 @@
 #include "../../brick_game.h"
 #include "../../utils/defines.h"
 #include "../../utils/utilities.h"
-#include "timer.h"
+#include "../../utils/timer.h"
 
 enum answer { YES, NO };
 
@@ -250,7 +250,7 @@ typedef struct {
 }TetrisData_t;
 
 void game_mechanics(TetrisData_t* data);
-GameInfo_t init_empty_gameInfo(void);
+GameInfo_t init_empty_gameInfo(int type);
 
 /**
  * @brief Объединяет поле с фигурой.
@@ -282,7 +282,7 @@ TetrisData_t *get_data(void);
 TetrisData_t init_empty_data(void);
 
 const char* stateToString(Tetris_state_t s);
-const char *actionToString(UserAction_t s) ;
+// const char *actionToString(UserAction_t s) ;
 void main_fsm(TetrisData_t *data, UserAction_t action);
 void game_fsm(TetrisData_t *data);
 void finish_game(TetrisData_t *data);

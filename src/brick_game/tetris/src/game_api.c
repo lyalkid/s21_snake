@@ -6,7 +6,7 @@
  */
 #include "../inc/tetris.h"
 #include  "../inc/tetramino_movement.h"
-#include "../inc/timer.h"
+
 
 // typedef enum {
 //     Start,
@@ -37,7 +37,7 @@ TetrisData_t init_empty_data(void) {
     // data.prev_state = data.current_state;
     data.shift_timer = init_shift_timer();
     data.current_tetraMino = init_empty_tetraMino();
-    data.current_game_info = init_empty_gameInfo();
+    data.current_game_info = init_empty_gameInfo(1);
     return data;
 }
 
@@ -66,33 +66,33 @@ const char *stateToString(Tetris_state_t s) {
     }
 }
 
-const char *actionToString(UserAction_t s) {
-    switch (s) {
-        case Start:
-            return "start      ";
-            break;
-        case Pause:
-            return "pause      ";
-            break;
-        case Terminate:
-            return "terminate  ";
-            break;
-        case Left:
-            return "left       ";
-            break;
-        case Right:
-            return "right      ";
-            break;
-        case Up:
-            return "up         ";
-            break;
-        case Down:
-            return "down       ";
-        case Action:
-            return "action     ";
-    }
-    return "none_action";
-}
+// const char *actionToString(UserAction_t s) {
+//     switch (s) {
+//         case Start:
+//             return "start      ";
+//             break;
+//         case Pause:
+//             return "pause      ";
+//             break;
+//         case Terminate:
+//             return "terminate  ";
+//             break;
+//         case Left:
+//             return "left       ";
+//             break;
+//         case Right:
+//             return "right      ";
+//             break;
+//         case Up:
+//             return "up         ";
+//             break;
+//         case Down:
+//             return "down       ";
+//         case Action:
+//             return "action     ";
+//     }
+//     return "none_action";
+// }
 
 void userInput(UserAction_t action, bool hold) {
     TetrisData_t *data = get_data();
@@ -207,7 +207,7 @@ void finish_game(TetrisData_t *data) {
 
 void reset_game(TetrisData_t *data) {
     data->current_tetraMino = init_empty_tetraMino();
-    data->current_game_info = init_empty_gameInfo();
+    data->current_game_info = init_empty_gameInfo(1);
 }
 
 void free_game(TetrisData_t *data) {
@@ -264,7 +264,7 @@ void is_game_over(int *state, int status) {
         *state = STATE_GAME_OVER;
 
         if (get_data()->current_game_info.score > get_data()->current_game_info.high_score)
-            write_high_score(get_data()->current_game_info.score);
+            write_high_score(get_data()->current_game_info.score, 1);
     }
 }
 

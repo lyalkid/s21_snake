@@ -12,9 +12,7 @@ void init_nc() {
   cbreak();
   noecho();
   //  int h = 0, w = 0;
-
   init_colors();
-
   nodelay(stdscr  , TRUE);
   keypad(stdscr, TRUE);
   curs_set(0);
@@ -82,7 +80,7 @@ void terminate_ncurses(Game_wins_t* t_wins) {
 Game_wins_t* get_game_wins() {
   static Game_wins_t* game_wins;
   if (game_wins == NULL) {
-    game_wins = malloc(sizeof(Game_wins_t));
+    game_wins = (Game_wins_t*)malloc(sizeof(Game_wins_t));
     game_wins->next_win = newwin(3, 25, 1, 1);
     game_wins->game_win = newwin(15, 25, 4, 1);
     game_wins->info_win = newwin(15, 25, 4, 26);
@@ -153,7 +151,7 @@ void init_menu(Game_wins_t* t_wins) {
   wrefresh(info_win);
 }
 
-void set_title(WINDOW* next_win, char* title) {
+void set_title(WINDOW* next_win, const char* title) {
   werase(next_win);
   mvwprintw(next_win, 1, 8, "%s", title);
 }
@@ -173,4 +171,45 @@ void print_menu(WINDOW* game_win, int highlight, const char** choices) {
     y++;
   }
   wrefresh(game_win);
+}
+void render_game_over(WINDOW *game_win) {
+  werase(game_win);
+  mvwprintw(game_win, HEIGHT / 2, WIDTH / 2, "IT's");
+  mvwprintw(game_win, HEIGHT / 2 + 1, WIDTH / 2, "GAME OVER");
+
+  box(game_win, 0, 0);
+  wrefresh(game_win);
+  refresh();
+}
+    void render_celebration(WINDOW* win) {
+  werase(win);
+  mvwprintw(win, HEIGHT / 2, WIDTH / 2, "CONGRATS!!!");
+  mvwprintw(win, HEIGHT / 2 + 1, WIDTH / 2, "YOU WON!");
+
+  box(win, 0, 0);
+  wrefresh(win);
+  refresh();
+}
+
+void render_pause(WINDOW *game_win) {
+  werase(game_win);
+  mvwprintw(game_win, HEIGHT / 2, WIDTH / 2, "PAUSE ");
+  box(game_win, 0, 0);
+  wrefresh(game_win);
+  refresh();
+}
+void render_welcome(WINDOW* gamewin) {
+  WINDOW *main_menu_win = gamewin;
+  werase(main_menu_win);
+  mvwprintw(main_menu_win, 1, WIDTH / 2, "HELLO ");
+  mvwprintw(main_menu_win, HEIGHT / 2 + 1, 1, "W,A,S,D - to move");
+  mvwprintw(main_menu_win, HEIGHT / 2 + 2, 1, "G - PAUSE");
+  mvwprintw(main_menu_win, HEIGHT / 2 + 3, 1,
+            "Q or ESCAPE -\n exit session/game ");
+  mvwprintw(main_menu_win, HEIGHT / 2 + 5, 1,
+            "N or ENTER - \n start/resume game ");
+
+  box(main_menu_win, 0, 0);
+  wrefresh(main_menu_win);
+  refresh();
 }

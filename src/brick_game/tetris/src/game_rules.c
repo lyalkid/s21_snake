@@ -44,5 +44,5 @@ void game_mechanics(TetrisData_t* data) {
 
   if (game_info->level == 10) data->is_win = true;
   if (get_data()->current_game_info.score > get_data()->current_game_info.high_score)
-    write_high_score(get_data()->current_game_info.score);
+    write_high_score(get_data()->current_game_info.score, 1);
 }
