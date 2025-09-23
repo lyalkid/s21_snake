@@ -14,52 +14,47 @@ TETRIS_OBJ = $(TETRIS_SRC:.c=.o)
 T_CLI_OBJ = $(T_CLI_SRC:.c=.o)
 T_LIB = libtetris.a
 T_CLI = libtcli.a
-
+#all, install, uninstall, clean, dvi, dist, test
 all:
-	#make clean
+	make clean
 	mkdir build
 	make install
 	make main
 	#./build/main
 
-
-main:
-	gcc gui/cli/main_cli.c -L. libtcli.a -lncurses -o build/cli
-
 install: cli desktop
 uninstall: clean
 
-cli: tetris_cli snake_cli
 
+cli: tetris_cli snake_cli
+tetris_cli: $(T_CLI) $(T_LIB)
+	gcc gui/cli/tetris/main_tetris.c -L. libtetris.a libtcli.a -lncurses -lm -o build/t_cli
+
+snake_cli:
+	g++ gui/cli/snake/main.cpp  $(SNAKE_SRC) -L. libtetris.a libtcli.a -lncurses -o build/s_cli
+main:
+	gcc gui/cli/main_cli.c -L. libtcli.a -lncurses -o build/cli
 desktop:
 	mkdir tmp
 	cd tmp && qmake ../gui/desktop/ && make
 	mv tmp/desktop build/
 	rm -rf tmp
 	#mv qui/desktop/tmp/desktop build
-
-tetris_cli: $(T_CLI) $(T_LIB)
-	gcc gui/cli/tetris/main_tetris.c -L. libtetris.a libtcli.a -lncurses -lm -o build/t_cli
-
-snake_cli:
-	g++ gui/cli/snake/main.cpp  $(SNAKE_SRC) -L. libtetris.a libtcli.a -lncurses -o build/s_cli
-
-style:
-	clang-format --style=Google -i $(TETRIS_SRC) $(T_CLI_SRC) $(SNAKE_SRC) gui/cli/snake/main.cpp gui/cli/tetris/main_tetris.c gui/desktop/*.cpp gui/desktop/*.h
-
-$(T_LIB): $(TETRIS_OBJ)
-	$(AR) $(ARFLAGS) $@ $^
-
-$(T_CLI): $(T_CLI_OBJ)
-	$(AR) $(ARFLAGS) -lncurses $@ $^
-
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
+DOCS_DIR = docs
 clean:
-	rm -rf $(TETRIS_OBJ) $(T_LIB) $(T_CLI_OBJ) $(T_CLI)  ./build ./tmp highscore_snake.txt highscore_tetris.txt $(GCOV_FOLDER) *.a
+	rm -rf $(TETRIS_OBJ) $(T_LIB) $(T_CLI_OBJ) $(DOCS_DIR) dist ./build ./tmp highscore_snake.txt highscore_tetris.txt $(GCOV_FOLDER) *.a
 
+
+dvi:
+	mkdir $(DOCS_DIR)
+	doxygen Doxyfile
+
+
+dist: all
+	mkdir dist
+	cp -r brick_game gui Makefile build dist/
+	tar -czf BRICKGAME-2.0.tar.gz dist
+	mv BRICKGAME-2.0.tar.gz dist
 
 test:
 	g++ $(SNAKE_SRC)  $(TETRIS_SRC) $(T_CLI_SRC) -lncurses  tests/test_snake_controller.cpp  -lgtest -lgtest_main  -lrt -lm -o test
@@ -79,5 +74,17 @@ gcov_report:
 	rm -rf gcov*
 
 
+style:
+	clang-format --style=Google -i $(TETRIS_SRC) $(T_CLI_SRC) $(SNAKE_SRC) gui/cli/snake/main.cpp gui/cli/tetris/main_tetris.c gui/desktop/*.cpp gui/desktop/*.h
+
+$(T_LIB): $(TETRIS_OBJ)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(T_CLI): $(T_CLI_OBJ)
+	$(AR) $(ARFLAGS) -lncurses $@ $^
+
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: all
