@@ -23,7 +23,6 @@
 //   return game_info;
 // }
 
-
 GameInfo_t init_empty_gameInfo(int type) {
   GameInfo_t gameInfo;
   gameInfo.score = 0;

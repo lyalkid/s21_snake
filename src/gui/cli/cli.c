@@ -13,7 +13,7 @@ void init_nc() {
   noecho();
   //  int h = 0, w = 0;
   init_colors();
-  nodelay(stdscr  , TRUE);
+  nodelay(stdscr, TRUE);
   keypad(stdscr, TRUE);
   curs_set(0);
   timeout(0);
@@ -172,7 +172,7 @@ void print_menu(WINDOW* game_win, int highlight, const char** choices) {
   }
   wrefresh(game_win);
 }
-void render_game_over(WINDOW *game_win) {
+void render_game_over(WINDOW* game_win) {
   werase(game_win);
   mvwprintw(game_win, HEIGHT / 2, WIDTH / 2, "IT's");
   mvwprintw(game_win, HEIGHT / 2 + 1, WIDTH / 2, "GAME OVER");
@@ -181,7 +181,7 @@ void render_game_over(WINDOW *game_win) {
   wrefresh(game_win);
   refresh();
 }
-    void render_celebration(WINDOW* win) {
+void render_celebration(WINDOW* win) {
   werase(win);
   mvwprintw(win, HEIGHT / 2, WIDTH / 2, "CONGRATS!!!");
   mvwprintw(win, HEIGHT / 2 + 1, WIDTH / 2, "YOU WON!");
@@ -191,7 +191,7 @@ void render_game_over(WINDOW *game_win) {
   refresh();
 }
 
-void render_pause(WINDOW *game_win) {
+void render_pause(WINDOW* game_win) {
   werase(game_win);
   mvwprintw(game_win, HEIGHT / 2, WIDTH / 2, "PAUSE ");
   box(game_win, 0, 0);
@@ -199,7 +199,7 @@ void render_pause(WINDOW *game_win) {
   refresh();
 }
 void render_welcome(WINDOW* gamewin) {
-  WINDOW *main_menu_win = gamewin;
+  WINDOW* main_menu_win = gamewin;
   werase(main_menu_win);
   mvwprintw(main_menu_win, 1, WIDTH / 2, "HELLO ");
   mvwprintw(main_menu_win, HEIGHT / 2 + 1, 1, "W,A,S,D - to move");

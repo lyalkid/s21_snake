@@ -16,7 +16,7 @@ void draw(TetrisData_t *data, Game_wins_t *t_wins) {
     draw_static(c_state, t_wins);
 
   } else {
-    if (data->changed){
+    if (data->changed) {
       draw_tetris(data->current_game_info, data->current_tetraMino, t_wins);
       data->changed = false;
     }
@@ -67,8 +67,8 @@ void render_next_win(WINDOW *next_win, int type) {
   mvwprintw(next_win, 1, 4 * 2, "NEXT");
   mvwprintw(next_win, 2, 3 * 2, "TETRAMINO:");
 
-    int coordinates[8] = {};
-    generateTetraminoShape(coordinates, COMPLETE, type);
+  int coordinates[8] = {};
+  generateTetraminoShape(coordinates, COMPLETE, type);
 
   for (int i = 0; i < 8; i += 2) {
     int x = coordinates[i];
@@ -152,8 +152,6 @@ char piece(int type) {
   return r;
 }
 
-
-
 // void init_ncurses(Tetris_wins_t* t_wins) {
 //   initscr();
 //   cbreak();
@@ -227,5 +225,3 @@ char piece(int type) {
 //   wrefresh(main_menu_win);
 //   refresh();
 // }
-
-

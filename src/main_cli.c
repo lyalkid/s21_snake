@@ -6,11 +6,11 @@ void start_game(int choice) {
   endwin();  // завершили текущую ncurses-сессию
   switch (choice) {
     case 1:
-      system("./t");
+      system("./build/t_cli");
       init_nc();
       break;
     case 2:
-       system("./brick_game/snake/main_snake");
+       system("./build/s_cli");
       break;
     default:
       break;

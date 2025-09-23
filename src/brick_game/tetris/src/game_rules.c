@@ -43,6 +43,7 @@ void game_mechanics(TetrisData_t* data) {
   data->shift_timer.delay_to_shift = (long)game_info->speed;
 
   if (game_info->level == 10) data->is_win = true;
-  if (get_data()->current_game_info.score > get_data()->current_game_info.high_score)
+  if (get_data()->current_game_info.score >
+      get_data()->current_game_info.high_score)
     write_high_score(get_data()->current_game_info.score, 1);
 }

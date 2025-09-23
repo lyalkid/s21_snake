@@ -9,15 +9,14 @@
 
 #include "../tetris/inc/tetris.h"
 void out(int **field) {
-printf("------------\n" );
+  printf("------------\n");
   print_array(field);
-printf("------------\n" );
-
+  printf("------------\n");
 }
 int **malloc_array(int rows, int cols) {
-  int **field = (int**) malloc(sizeof(int *) * rows);
+  int **field = (int **)malloc(sizeof(int *) * rows);
   for (int i = 0; i < rows; i++) {
-    field[i] =(int*) calloc(cols, sizeof(int));
+    field[i] = (int *)calloc(cols, sizeof(int));
   }
   null_array(field, rows, cols);
   return field;
@@ -77,14 +76,11 @@ void print_array(int **array) {
     for (int j = 0; j < WIDTH; j++) {
       if (array[i][j] == 3) {
         printf("%c ", '+');
-      }
-      else if (array[i][j] == 2) {
+      } else if (array[i][j] == 2) {
         printf("%c ", 'o');
-      }
-      else if (array[i][j] == 1) {
+      } else if (array[i][j] == 1) {
         printf("%c ", '@');
-      }
-      else {
+      } else {
         printf("  ");
       }
     }
@@ -144,7 +140,7 @@ int get_max(const int a, const int b) { return a < b ? b : a; }
 int get_highScore(int type) {
   int h_score = 0;
   // return 100;
-  const char* filename;
+  const char *filename;
 
   if (type == 1) {
     filename = "highscore_tetris.txt";
@@ -155,7 +151,7 @@ int get_highScore(int type) {
   // буфер для считавания данных из файла
   char buffer[size];
   // чтение из файла
-  FILE* fp = fopen(filename, "r");
+  FILE *fp = fopen(filename, "r");
   if (fp) {
     // пока не дойдем до конца, считываем по 256 байт
     fgets(buffer, size, fp);
@@ -166,7 +162,7 @@ int get_highScore(int type) {
 };
 
 void write_high_score(int h_score, int type) {
-  const char* filename;
+  const char *filename;
   if (type == 1) {
     filename = "highscore_tetris.txt";
   } else {
@@ -175,7 +171,7 @@ void write_high_score(int h_score, int type) {
   int size = 1000;
   char buffer[size];
 
-  FILE* fp = fopen(filename, "w");
+  FILE *fp = fopen(filename, "w");
   if (fp) {
     sprintf(buffer, "%d", h_score);
     fputs(buffer, fp);
