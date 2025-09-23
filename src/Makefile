@@ -6,7 +6,7 @@ ARFLAGS = rcs
 BG = brick_game
 TETRIS_SRC=$(wildcard $(BG)/tetris/*/*.c $(BG)/utils/*.c $(BG)/*.c)
 T_CLI_SRC = $(wildcard  gui/cli/*.c gui/cli/tetris/*.c )
-SNAKE_SRC = $(wildcard $(BG)/snake/*/*.cpp $(BG)/snake/main.cpp  )
+SNAKE_SRC = $(wildcard $(BG)/snake/*/*.cpp gui/cli/snake/main.cpp  )
 
 TETRIS_OBJ = $(TETRIS_SRC:.c=.o)
 T_CLI_OBJ = $(T_CLI_SRC:.c=.o)

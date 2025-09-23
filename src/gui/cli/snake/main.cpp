@@ -4,45 +4,19 @@
  * @details
  *
  */
-#include "controller/controller.h"
-#include "model/Snake.h"
+#include "../../../brick_game/snake/controller/controller.h"
+#include "../../../brick_game/snake/model/Snake.h"
 
 extern "C" {
-#include "../../gui/cli/cli.h"
-#include "../../gui/cli/tetris/frontend.h"
-#include "../brick_game.h"
-#include "../utils/timer.h"
+#include "../cli.h"
+#include "../tetris/frontend.h"
+#include "../../../brick_game/brick_game.h"
+#include "../../../brick_game/utils/timer.h"
 }
 
 using namespace s21;
 
-// const char *actionToString(UserAction_t s) {
-//     switch (s) {
-//         case Start:
-//             return "start      ";
-//             break;
-//         case Pause:
-//             return "pause      ";
-//             break;
-//         case Terminate:
-//             return "terminate  ";
-//             break;
-//         case Left:
-//             return "left       ";
-//             break;
-//         case Right:
-//             return "right      ";
-//             break;
-//         case Up:
-//             return "up         ";
-//             break;
-//         case Down:
-//             return "down       ";
-//         case Action:
-//             return "action     ";
-//     }
-//     return "none_action";
-// }
+
 
 void debug_info_snake(UserAction_t action, Vec2 dir, Vec2 head, bool shift,
                       Vec2 body[], int score, int speed) {
@@ -126,21 +100,8 @@ int main() {
   UserAction_t action;
   while (controller.get_active()) {
     action = getSignal(getch());
-
-    // debug_info_snake(action, controller.get_model().getDirection(),
-    // controller.get_model().getHead(),
-    //                  controller.timer.time_to_shift,
-    //                  controller.get_model().getBody(),
-    //                  controller.get_model().getScore(),
-    //                  controller.get_game_info().speed);
-
     controller.userInput(action, true);
-
-    // if (controller.get_updated()) {
     draw_snake(win, controller.updateCurrentState(), controller.get_state());
-    //     controller.set_updated();
-    // }
-
     countTime(&controller.timer);
   }
   delwin(win);
