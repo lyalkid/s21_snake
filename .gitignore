@@ -30,7 +30,7 @@ build/
 # ACTIVE_TAG_FILES.txt
 # CHANGELOG
 # LICENSE
-*.md
+# *.md
 
 
 # Libraries
