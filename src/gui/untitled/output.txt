@@ -1,0 +1,3444 @@
+Path: ./mainwindow.h
+Contents:
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
+// #include "../../brick_game/tetris/inc/tetris.h"
+// #ifdef __cplusplus
+// }
+// #endif
+// #include <string.h>
+
+#include <QMainWindow>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
+
+#include "snake_widget.h"
+#include "tetris_widget.h"
+#include "ui_mainwindow.h"
+
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow {
+  Q_OBJECT
+
+ public:
+  MainWindow(QWidget *parent = nullptr);
+  ~MainWindow();
+
+ private:
+  Ui::MainWindow *ui;
+  Tetris_Widget *tetris;
+  Snake_Widget *snake;
+  QPushButton *tetris_button;
+  QPushButton *snake_button;
+  QVBoxLayout *layout;
+  QWidget *central;
+
+ private slots:
+  void start_tetris();
+  void start_snake();
+};
+#endif  // MAINWINDOW_H
+
+--------------------------------------------------
+
+Path: ./untitled.pro
+Contents:
+QT       += core gui
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+CONFIG += c++17
+
+# You can make your code fail to compile if it uses deprecated APIs.
+# In order to do so, uncomment the following line.
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+
+SOURCES += \
+    ../../brick_game/brick_game.c \
+    ../../brick_game/snake/controller/controller.cpp \
+    ../../brick_game/snake/model/Snake.cpp \
+    ../../brick_game/tetris/src/TGM3Randomizer.c \
+    ../../brick_game/tetris/src/field_mechanics.c \
+    ../../brick_game/tetris/src/game_api.c \
+    ../../brick_game/tetris/src/game_rules.c \
+    ../../brick_game/tetris/src/game_state_management.c \
+    ../../brick_game/tetris/src/tetramino.c \
+    ../../brick_game/tetris/src/tetramino_movement.c \
+    ../../brick_game/utils/timer.c \
+    ../../brick_game/utils/utilities.c \
+    main.cpp \
+    mainwindow.cpp \
+    snake_widget.cpp \
+    tetris_widget.cpp
+
+HEADERS += \
+    ../../brick_game/brick_game.h \
+    ../../brick_game/snake/controller/controller.h \
+    ../../brick_game/snake/model/Snake.h \
+    ../../brick_game/tetris/inc/tetramino_movement.h \
+    ../../brick_game/tetris/inc/tetris.h \
+    ../../brick_game/utils/timer.h \
+    ../../brick_game/utils/defines.h \
+    ../../brick_game/utils/utilities.h \
+    mainwindow.h \
+    snake_widget.h \
+    tetris_widget.h
+
+FORMS += \
+    mainwindow.ui
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
+
+--------------------------------------------------
+
+Path: ./snake_widget.h
+Contents:
+#ifndef SNAKE_WIDGET_H
+#define SNAKE_WIDGET_H
+
+#include <QKeyEvent>
+#include <QPainter>
+#include <QTimer>
+#include <QWidget>
+
+#include "../../brick_game/snake/controller/controller.h"
+#include "../../brick_game/snake/model/Snake.h"
+class Snake_Widget : public QWidget {
+  Q_OBJECT
+ public:
+  explicit Snake_Widget(QWidget *parent = nullptr);
+  ~Snake_Widget() = default;
+  void print_welcome(QPainter &p, Snake_state state);
+
+ signals:
+  void finished_snake();  //
+ protected:
+  void paintEvent(QPaintEvent *e) override;
+  void keyPressEvent(QKeyEvent *e) override;
+  void closeEvent(QCloseEvent *event) override;
+
+ private:
+  s21::Controller controller;
+  QTimer *timer;
+
+ private slots:
+  void update_draw();
+};
+
+#endif  // SNAKE_WIDGET_H
+
+--------------------------------------------------
+
+Path: ./game.cpp
+Contents:
+
+
+--------------------------------------------------
+
+Path: ./mainwindow.cpp
+Contents:
+#include "mainwindow.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), tetris(new Tetris_Widget) {
+  ui->setupUi(this);
+  setFixedSize(300, 300);
+  setWindowTitle("BRICK_GAME");
+
+  central = new QWidget(this);
+  layout = new QVBoxLayout(central);
+
+  tetris_button = new QPushButton("tetris", central);
+  snake_button = new QPushButton("snake", central);
+  layout->addWidget(tetris_button);
+  layout->addWidget(snake_button);
+
+  setCentralWidget(central);
+  connect(tetris_button, &QPushButton::clicked, this,
+          &MainWindow::start_tetris);
+  connect(snake_button, &QPushButton::clicked, this, &MainWindow::start_snake);
+
+  connect(tetris, &Tetris_Widget::finished, this, &MainWindow::show);
+  connect(snake, &Snake_Widget::finished_snake, this, &MainWindow::show);
+}
+
+MainWindow::~MainWindow() {
+  // delete ui;
+}
+
+void MainWindow::start_tetris() {
+  hide();
+  tetris->show();
+}
+void MainWindow::start_snake() {
+  hide();
+  snake->show();
+}
+
+--------------------------------------------------
+
+Path: ./widget.h
+Contents:
+#ifndef WIDGET_H
+#define WIDGET_H
+
+#include <QWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
+
+class Widget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit Widget(QWidget *parent = nullptr);
+    ~Widget();
+private:
+    QPushButton *tetris_button;
+    QVBoxLayout *layout;
+
+};
+
+#endif // WIDGET_H
+
+--------------------------------------------------
+
+Path: ./mainwindow.ui
+Contents:
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>19</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+--------------------------------------------------
+
+Path: ./widget.cpp
+Contents:
+#include "widget.h"
+
+Widget::Widget(QWidget *parent)
+    : QWidget{parent}
+{
+    setWindowTitle("BRICK_GAME");
+    tetris_button = new QPushButton("tetris");
+    layout = new QVBoxLayout(this);
+    layout->addWidget(tetris_button);
+}
+
+
+Widget::~Widget() {
+
+
+}
+
+--------------------------------------------------
+
+Path: ./untitled.pro.user
+Contents:
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QtCreatorProject>
+<!-- Written by QtCreator 13.0.0, 2025-09-23T04:15:54. -->
+<qtcreator>
+ <data>
+  <variable>EnvironmentId</variable>
+  <value type="QByteArray">{5db2908c-7b41-4401-86a0-e6b8c49f9503}</value>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.ActiveTarget</variable>
+  <value type="qlonglong">0</value>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.EditorSettings</variable>
+  <valuemap type="QVariantMap">
+   <value type="bool" key="EditorConfiguration.AutoIndent">true</value>
+   <value type="bool" key="EditorConfiguration.AutoSpacesForTabs">false</value>
+   <value type="bool" key="EditorConfiguration.CamelCaseNavigation">true</value>
+   <valuemap type="QVariantMap" key="EditorConfiguration.CodeStyle.0">
+    <value type="QString" key="language">Cpp</value>
+    <valuemap type="QVariantMap" key="value">
+     <value type="QByteArray" key="CurrentPreferences">CppGlobal</value>
+    </valuemap>
+   </valuemap>
+   <valuemap type="QVariantMap" key="EditorConfiguration.CodeStyle.1">
+    <value type="QString" key="language">QmlJS</value>
+    <valuemap type="QVariantMap" key="value">
+     <value type="QByteArray" key="CurrentPreferences">QmlJSGlobal</value>
+    </valuemap>
+   </valuemap>
+   <value type="qlonglong" key="EditorConfiguration.CodeStyle.Count">2</value>
+   <value type="QByteArray" key="EditorConfiguration.Codec">UTF-8</value>
+   <value type="bool" key="EditorConfiguration.ConstrainTooltips">false</value>
+   <value type="int" key="EditorConfiguration.IndentSize">4</value>
+   <value type="bool" key="EditorConfiguration.KeyboardTooltips">false</value>
+   <value type="int" key="EditorConfiguration.MarginColumn">80</value>
+   <value type="bool" key="EditorConfiguration.MouseHiding">true</value>
+   <value type="bool" key="EditorConfiguration.MouseNavigation">true</value>
+   <value type="int" key="EditorConfiguration.PaddingMode">1</value>
+   <value type="int" key="EditorConfiguration.PreferAfterWhitespaceComments">0</value>
+   <value type="bool" key="EditorConfiguration.PreferSingleLineComments">false</value>
+   <value type="bool" key="EditorConfiguration.ScrollWheelZooming">true</value>
+   <value type="bool" key="EditorConfiguration.ShowMargin">false</value>
+   <value type="int" key="EditorConfiguration.SmartBackspaceBehavior">2</value>
+   <value type="bool" key="EditorConfiguration.SmartSelectionChanging">true</value>
+   <value type="bool" key="EditorConfiguration.SpacesForTabs">true</value>
+   <value type="int" key="EditorConfiguration.TabKeyBehavior">0</value>
+   <value type="int" key="EditorConfiguration.TabSize">8</value>
+   <value type="bool" key="EditorConfiguration.UseGlobal">true</value>
+   <value type="bool" key="EditorConfiguration.UseIndenter">false</value>
+   <value type="int" key="EditorConfiguration.Utf8BomBehavior">1</value>
+   <value type="bool" key="EditorConfiguration.addFinalNewLine">true</value>
+   <value type="bool" key="EditorConfiguration.cleanIndentation">true</value>
+   <value type="bool" key="EditorConfiguration.cleanWhitespace">true</value>
+   <value type="QString" key="EditorConfiguration.ignoreFileTypes">*.md, *.MD, Makefile</value>
+   <value type="bool" key="EditorConfiguration.inEntireDocument">false</value>
+   <value type="bool" key="EditorConfiguration.skipTrailingWhitespace">true</value>
+   <value type="bool" key="EditorConfiguration.tintMarginArea">true</value>
+  </valuemap>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.PluginSettings</variable>
+  <valuemap type="QVariantMap">
+   <valuemap type="QVariantMap" key="AutoTest.ActiveFrameworks">
+    <value type="bool" key="AutoTest.Framework.Boost">true</value>
+    <value type="bool" key="AutoTest.Framework.CTest">false</value>
+    <value type="bool" key="AutoTest.Framework.Catch">true</value>
+    <value type="bool" key="AutoTest.Framework.GTest">true</value>
+    <value type="bool" key="AutoTest.Framework.QtQuickTest">true</value>
+    <value type="bool" key="AutoTest.Framework.QtTest">true</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="AutoTest.CheckStates"/>
+   <value type="int" key="AutoTest.RunAfterBuild">0</value>
+   <value type="bool" key="AutoTest.UseGlobal">true</value>
+   <valuemap type="QVariantMap" key="ClangTools">
+    <value type="bool" key="ClangTools.AnalyzeOpenFiles">true</value>
+    <value type="bool" key="ClangTools.BuildBeforeAnalysis">true</value>
+    <value type="QString" key="ClangTools.DiagnosticConfig">Builtin.DefaultTidyAndClazy</value>
+    <value type="int" key="ClangTools.ParallelJobs">4</value>
+    <value type="bool" key="ClangTools.PreferConfigFile">true</value>
+    <valuelist type="QVariantList" key="ClangTools.SelectedDirs"/>
+    <valuelist type="QVariantList" key="ClangTools.SelectedFiles"/>
+    <valuelist type="QVariantList" key="ClangTools.SuppressedDiagnostics"/>
+    <value type="bool" key="ClangTools.UseGlobalSettings">true</value>
+   </valuemap>
+  </valuemap>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.Target.0</variable>
+  <valuemap type="QVariantMap">
+   <value type="QString" key="DeviceType">Desktop</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{6a7b9352-f769-4c63-af73-4c9f02288c04}</value>
+   <value type="qlonglong" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
+   <value type="qlonglong" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
+   <value type="qlonglong" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
+    <value type="int" key="EnableQmlDebugging">0</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug</value>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">QtProjectManager.QMakeBuildStep</value>
+      <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">false</value>
+      <valuelist type="QVariantList" key="QtProjectManager.QMakeBuildStep.SelectedAbis"/>
+     </valuemap>
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.1">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">2</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Build</value>
+    </valuemap>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.1">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+      <value type="QString" key="Qt4ProjectManager.MakeStep.MakeArguments">clean</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Clean</value>
+    </valuemap>
+    <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">2</value>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.CustomParsers"/>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ParseStandardOutput">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges"/>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Debug</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>
+    <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">2</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Release</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Release</value>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">QtProjectManager.QMakeBuildStep</value>
+      <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">false</value>
+      <valuelist type="QVariantList" key="QtProjectManager.QMakeBuildStep.SelectedAbis"/>
+     </valuemap>
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.1">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">2</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Build</value>
+    </valuemap>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.1">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+      <value type="QString" key="Qt4ProjectManager.MakeStep.MakeArguments">clean</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Clean</value>
+    </valuemap>
+    <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">2</value>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.CustomParsers"/>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ParseStandardOutput">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges"/>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Release</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>
+    <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">0</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.2">
+    <value type="int" key="EnableQmlDebugging">0</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Profile</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Profile</value>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">QtProjectManager.QMakeBuildStep</value>
+      <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">false</value>
+      <valuelist type="QVariantList" key="QtProjectManager.QMakeBuildStep.SelectedAbis"/>
+     </valuemap>
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.1">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">2</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Build</value>
+    </valuemap>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.1">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+      <value type="QString" key="Qt4ProjectManager.MakeStep.MakeArguments">clean</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Clean</value>
+    </valuemap>
+    <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">2</value>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.CustomParsers"/>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ParseStandardOutput">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges"/>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Profile</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>
+    <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">0</value>
+    <value type="int" key="SeparateDebugInfo">0</value>
+   </valuemap>
+   <value type="qlonglong" key="ProjectExplorer.Target.BuildConfigurationCount">3</value>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.DeployConfiguration.0">
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">0</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Deploy</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Deploy</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Deploy</value>
+    </valuemap>
+    <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">1</value>
+    <valuemap type="QVariantMap" key="ProjectExplorer.DeployConfiguration.CustomData"/>
+    <value type="bool" key="ProjectExplorer.DeployConfiguration.CustomDataEnabled">false</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.DefaultDeployConfiguration</value>
+   </valuemap>
+   <value type="qlonglong" key="ProjectExplorer.Target.DeployConfigurationCount">1</value>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.0">
+    <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.QmlProfiler.Settings.UseGlobalSettings">true</value>
+    <value type="int" key="Analyzer.Valgrind.Callgrind.CostFormat">0</value>
+    <value type="bool" key="Analyzer.Valgrind.Settings.UseGlobalSettings">true</value>
+    <valuelist type="QVariantList" key="CustomOutputParsers"/>
+    <value type="int" key="PE.EnvironmentAspect.Base">2</value>
+    <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
+    <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
+    <value type="QString" key="PerfRecordArgsId">-e cpu-cycles --call-graph dwarf,4096 -F 250</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/gulsara/code/tsc/src/gui/untitled/untitled.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/gulsara/code/tsc/src/gui/untitled/untitled.pro</value>
+    <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">false</value>
+    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
+    <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug</value>
+   </valuemap>
+   <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
+  </valuemap>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.TargetCount</variable>
+  <value type="qlonglong">1</value>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.Updater.FileVersion</variable>
+  <value type="int">22</value>
+ </data>
+ <data>
+  <variable>Version</variable>
+  <value type="int">22</value>
+ </data>
+</qtcreator>
+
+--------------------------------------------------
+
+Path: ./tetriswidget.cpp
+Contents:
+#include "tetriswidget.h"
+
+T_widget::T_widget(QWidget *parent) : QWidget(parent) {
+  setFixedSize(600, 800);
+  setWindowTitle("Tetris");
+  timer = new QTimer;
+  data = get_data();
+  connect(timer, &QTimer::timeout, this, &T_widget::update_draw);
+  timer->start(50);
+}
+T_widget::~T_widget() { delete timer; }
+
+void T_widget::paintEvent(QPaintEvent *e) {
+  Q_UNUSED(e)
+  QPainter p(this);
+  p.drawRect(0, 0, 300, 600);
+  GameInfo_t inf = updateCurrentState();
+  ;
+  for (int i{}; i < 20; ++i) {
+    for (int j{}; j < 10; ++j) {
+      if (inf.field[i][j]) {
+        p.setBrush(Qt::black);
+      } else {
+        p.setBrush(Qt::white);
+      }
+      p.drawRect(30 * j, 30 * i, 30, 30);
+    }
+  }
+}
+
+// using namespace :Qt;
+void T_widget::keyPressEvent(QKeyEvent *e) {
+  UserAction_t action;
+  switch (e->key()) {
+    case Qt::Key_Up:
+      action = Up;
+      break;
+    case Qt::Key_Down:
+      action = Down;
+      break;
+    case Qt::Key_Left:
+      action = Left;
+      break;
+    case Qt::Key_Right:
+      action = Right;
+      break;
+    case 'p':
+      action = Pause;
+      break;
+    case 'n':
+      action = Start;
+      break;
+    case 'q':
+      action = Terminate;
+
+      break;
+    case 'f':
+      action = Action;
+      break;
+    default:
+      action = (UserAction_t)NONE_ACTION;
+      break;
+  }
+
+  userInput(action, false);
+  update_draw();
+  if (action == Terminate) {
+    QWidget::close();
+  }
+}
+void T_widget::update_draw() { repaint(); }
+
+--------------------------------------------------
+
+Path: ./main.cpp
+Contents:
+#include <QApplication>
+
+#include "../../brick_game/tetris/inc/tetris.h"
+#include "mainwindow.h"
+
+int main(int argc, char *argv[]) {
+  QApplication a(argc, argv);
+  MainWindow w;
+  w.show();
+  return a.exec();
+}
+
+--------------------------------------------------
+
+Path: ./tetris_widget.h
+Contents:
+#ifndef TETRIS_WIDGET_H
+#define TETRIS_WIDGET_H
+
+extern "C" {
+#include "../../brick_game/tetris/inc/tetris.h"
+}
+
+#include <QCloseEvent>
+#include <QKeyEvent>
+#include <QPainter>
+#include <QPoint>
+#include <QTimer>
+#include <QVector>
+#include <QWidget>
+
+class Tetris_Widget : public QWidget {
+  Q_OBJECT
+ public:
+  explicit Tetris_Widget(QWidget *parent = nullptr);
+  ~Tetris_Widget();
+
+  void print_welcome(QPainter &p, Tetris_state_t state);
+  void print_game(QPainter &p, int **field, int **next, int size);
+  void print_info(QPainter &p, int level, int score, int high_score, int size);
+  void print_next(QPainter &p, int type, int size);
+  void paint_tetramino(QRectF cellRect, int value, QPainter &p, int size);
+
+  QColor colorForType(int type) const;
+
+ signals:
+  void finished();  //
+ protected:
+  void paintEvent(QPaintEvent *e) override;
+  void keyPressEvent(QKeyEvent *e) override;
+  void closeEvent(QCloseEvent *event) override;
+
+ private:
+  TetrisData_t *data;
+  QTimer *timer;
+
+ private slots:
+  void update_draw();
+};
+
+#endif  // TETRIS_WIDGET_H
+
+--------------------------------------------------
+
+Path: ./tetriswidget.h
+Contents:
+
+
+--------------------------------------------------
+
+Path: ./output.txt
+Contents:
+Path: ./mainwindow.h
+Contents:
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
+// #include "../../brick_game/tetris/inc/tetris.h"
+// #ifdef __cplusplus
+// }
+// #endif
+// #include <string.h>
+
+#include <QMainWindow>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
+
+#include "snake_widget.h"
+#include "tetris_widget.h"
+#include "ui_mainwindow.h"
+
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow {
+  Q_OBJECT
+
+ public:
+  MainWindow(QWidget *parent = nullptr);
+  ~MainWindow();
+
+ private:
+  Ui::MainWindow *ui;
+  Tetris_Widget *tetris;
+  Snake_Widget *snake;
+  QPushButton *tetris_button;
+  QPushButton *snake_button;
+  QVBoxLayout *layout;
+  QWidget *central;
+
+ private slots:
+  void start_tetris();
+  void start_snake();
+};
+#endif  // MAINWINDOW_H
+
+--------------------------------------------------
+
+Path: ./untitled.pro
+Contents:
+QT       += core gui
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+CONFIG += c++17
+
+# You can make your code fail to compile if it uses deprecated APIs.
+# In order to do so, uncomment the following line.
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+
+SOURCES += \
+    ../../brick_game/brick_game.c \
+    ../../brick_game/snake/controller/controller.cpp \
+    ../../brick_game/snake/model/Snake.cpp \
+    ../../brick_game/tetris/src/TGM3Randomizer.c \
+    ../../brick_game/tetris/src/field_mechanics.c \
+    ../../brick_game/tetris/src/game_api.c \
+    ../../brick_game/tetris/src/game_rules.c \
+    ../../brick_game/tetris/src/game_state_management.c \
+    ../../brick_game/tetris/src/tetramino.c \
+    ../../brick_game/tetris/src/tetramino_movement.c \
+    ../../brick_game/utils/timer.c \
+    ../../brick_game/utils/utilities.c \
+    main.cpp \
+    mainwindow.cpp \
+    snake_widget.cpp \
+    tetris_widget.cpp
+
+HEADERS += \
+    ../../brick_game/brick_game.h \
+    ../../brick_game/snake/controller/controller.h \
+    ../../brick_game/snake/model/Snake.h \
+    ../../brick_game/tetris/inc/tetramino_movement.h \
+    ../../brick_game/tetris/inc/tetris.h \
+    ../../brick_game/utils/timer.h \
+    ../../brick_game/utils/defines.h \
+    ../../brick_game/utils/utilities.h \
+    mainwindow.h \
+    snake_widget.h \
+    tetris_widget.h
+
+FORMS += \
+    mainwindow.ui
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
+
+--------------------------------------------------
+
+Path: ./snake_widget.h
+Contents:
+#ifndef SNAKE_WIDGET_H
+#define SNAKE_WIDGET_H
+
+#include <QKeyEvent>
+#include <QPainter>
+#include <QTimer>
+#include <QWidget>
+
+#include "../../brick_game/snake/controller/controller.h"
+#include "../../brick_game/snake/model/Snake.h"
+class Snake_Widget : public QWidget {
+  Q_OBJECT
+ public:
+  explicit Snake_Widget(QWidget *parent = nullptr);
+  ~Snake_Widget() = default;
+  void print_welcome(QPainter &p, Snake_state state);
+
+ signals:
+  void finished_snake();  //
+ protected:
+  void paintEvent(QPaintEvent *e) override;
+  void keyPressEvent(QKeyEvent *e) override;
+  void closeEvent(QCloseEvent *event) override;
+
+ private:
+  s21::Controller controller;
+  QTimer *timer;
+
+ private slots:
+  void update_draw();
+};
+
+#endif  // SNAKE_WIDGET_H
+
+--------------------------------------------------
+
+Path: ./game.cpp
+Contents:
+
+
+--------------------------------------------------
+
+Path: ./mainwindow.cpp
+Contents:
+#include "mainwindow.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), tetris(new Tetris_Widget) {
+  ui->setupUi(this);
+  setFixedSize(300, 300);
+  setWindowTitle("BRICK_GAME");
+
+  central = new QWidget(this);
+  layout = new QVBoxLayout(central);
+
+  tetris_button = new QPushButton("tetris", central);
+  snake_button = new QPushButton("snake", central);
+  layout->addWidget(tetris_button);
+  layout->addWidget(snake_button);
+
+  setCentralWidget(central);
+  connect(tetris_button, &QPushButton::clicked, this,
+          &MainWindow::start_tetris);
+  connect(snake_button, &QPushButton::clicked, this, &MainWindow::start_snake);
+
+  connect(tetris, &Tetris_Widget::finished, this, &MainWindow::show);
+  connect(snake, &Snake_Widget::finished_snake, this, &MainWindow::show);
+}
+
+MainWindow::~MainWindow() {
+  // delete ui;
+}
+
+void MainWindow::start_tetris() {
+  hide();
+  tetris->show();
+}
+void MainWindow::start_snake() {
+  hide();
+  snake->show();
+}
+
+--------------------------------------------------
+
+Path: ./widget.h
+Contents:
+#ifndef WIDGET_H
+#define WIDGET_H
+
+#include <QWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
+
+class Widget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit Widget(QWidget *parent = nullptr);
+    ~Widget();
+private:
+    QPushButton *tetris_button;
+    QVBoxLayout *layout;
+
+};
+
+#endif // WIDGET_H
+
+--------------------------------------------------
+
+Path: ./mainwindow.ui
+Contents:
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>19</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+--------------------------------------------------
+
+Path: ./widget.cpp
+Contents:
+#include "widget.h"
+
+Widget::Widget(QWidget *parent)
+    : QWidget{parent}
+{
+    setWindowTitle("BRICK_GAME");
+    tetris_button = new QPushButton("tetris");
+    layout = new QVBoxLayout(this);
+    layout->addWidget(tetris_button);
+}
+
+
+Widget::~Widget() {
+
+
+}
+
+--------------------------------------------------
+
+Path: ./untitled.pro.user
+Contents:
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QtCreatorProject>
+<!-- Written by QtCreator 13.0.0, 2025-09-23T04:15:54. -->
+<qtcreator>
+ <data>
+  <variable>EnvironmentId</variable>
+  <value type="QByteArray">{5db2908c-7b41-4401-86a0-e6b8c49f9503}</value>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.ActiveTarget</variable>
+  <value type="qlonglong">0</value>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.EditorSettings</variable>
+  <valuemap type="QVariantMap">
+   <value type="bool" key="EditorConfiguration.AutoIndent">true</value>
+   <value type="bool" key="EditorConfiguration.AutoSpacesForTabs">false</value>
+   <value type="bool" key="EditorConfiguration.CamelCaseNavigation">true</value>
+   <valuemap type="QVariantMap" key="EditorConfiguration.CodeStyle.0">
+    <value type="QString" key="language">Cpp</value>
+    <valuemap type="QVariantMap" key="value">
+     <value type="QByteArray" key="CurrentPreferences">CppGlobal</value>
+    </valuemap>
+   </valuemap>
+   <valuemap type="QVariantMap" key="EditorConfiguration.CodeStyle.1">
+    <value type="QString" key="language">QmlJS</value>
+    <valuemap type="QVariantMap" key="value">
+     <value type="QByteArray" key="CurrentPreferences">QmlJSGlobal</value>
+    </valuemap>
+   </valuemap>
+   <value type="qlonglong" key="EditorConfiguration.CodeStyle.Count">2</value>
+   <value type="QByteArray" key="EditorConfiguration.Codec">UTF-8</value>
+   <value type="bool" key="EditorConfiguration.ConstrainTooltips">false</value>
+   <value type="int" key="EditorConfiguration.IndentSize">4</value>
+   <value type="bool" key="EditorConfiguration.KeyboardTooltips">false</value>
+   <value type="int" key="EditorConfiguration.MarginColumn">80</value>
+   <value type="bool" key="EditorConfiguration.MouseHiding">true</value>
+   <value type="bool" key="EditorConfiguration.MouseNavigation">true</value>
+   <value type="int" key="EditorConfiguration.PaddingMode">1</value>
+   <value type="int" key="EditorConfiguration.PreferAfterWhitespaceComments">0</value>
+   <value type="bool" key="EditorConfiguration.PreferSingleLineComments">false</value>
+   <value type="bool" key="EditorConfiguration.ScrollWheelZooming">true</value>
+   <value type="bool" key="EditorConfiguration.ShowMargin">false</value>
+   <value type="int" key="EditorConfiguration.SmartBackspaceBehavior">2</value>
+   <value type="bool" key="EditorConfiguration.SmartSelectionChanging">true</value>
+   <value type="bool" key="EditorConfiguration.SpacesForTabs">true</value>
+   <value type="int" key="EditorConfiguration.TabKeyBehavior">0</value>
+   <value type="int" key="EditorConfiguration.TabSize">8</value>
+   <value type="bool" key="EditorConfiguration.UseGlobal">true</value>
+   <value type="bool" key="EditorConfiguration.UseIndenter">false</value>
+   <value type="int" key="EditorConfiguration.Utf8BomBehavior">1</value>
+   <value type="bool" key="EditorConfiguration.addFinalNewLine">true</value>
+   <value type="bool" key="EditorConfiguration.cleanIndentation">true</value>
+   <value type="bool" key="EditorConfiguration.cleanWhitespace">true</value>
+   <value type="QString" key="EditorConfiguration.ignoreFileTypes">*.md, *.MD, Makefile</value>
+   <value type="bool" key="EditorConfiguration.inEntireDocument">false</value>
+   <value type="bool" key="EditorConfiguration.skipTrailingWhitespace">true</value>
+   <value type="bool" key="EditorConfiguration.tintMarginArea">true</value>
+  </valuemap>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.PluginSettings</variable>
+  <valuemap type="QVariantMap">
+   <valuemap type="QVariantMap" key="AutoTest.ActiveFrameworks">
+    <value type="bool" key="AutoTest.Framework.Boost">true</value>
+    <value type="bool" key="AutoTest.Framework.CTest">false</value>
+    <value type="bool" key="AutoTest.Framework.Catch">true</value>
+    <value type="bool" key="AutoTest.Framework.GTest">true</value>
+    <value type="bool" key="AutoTest.Framework.QtQuickTest">true</value>
+    <value type="bool" key="AutoTest.Framework.QtTest">true</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="AutoTest.CheckStates"/>
+   <value type="int" key="AutoTest.RunAfterBuild">0</value>
+   <value type="bool" key="AutoTest.UseGlobal">true</value>
+   <valuemap type="QVariantMap" key="ClangTools">
+    <value type="bool" key="ClangTools.AnalyzeOpenFiles">true</value>
+    <value type="bool" key="ClangTools.BuildBeforeAnalysis">true</value>
+    <value type="QString" key="ClangTools.DiagnosticConfig">Builtin.DefaultTidyAndClazy</value>
+    <value type="int" key="ClangTools.ParallelJobs">4</value>
+    <value type="bool" key="ClangTools.PreferConfigFile">true</value>
+    <valuelist type="QVariantList" key="ClangTools.SelectedDirs"/>
+    <valuelist type="QVariantList" key="ClangTools.SelectedFiles"/>
+    <valuelist type="QVariantList" key="ClangTools.SuppressedDiagnostics"/>
+    <value type="bool" key="ClangTools.UseGlobalSettings">true</value>
+   </valuemap>
+  </valuemap>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.Target.0</variable>
+  <valuemap type="QVariantMap">
+   <value type="QString" key="DeviceType">Desktop</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{6a7b9352-f769-4c63-af73-4c9f02288c04}</value>
+   <value type="qlonglong" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
+   <value type="qlonglong" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
+   <value type="qlonglong" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
+    <value type="int" key="EnableQmlDebugging">0</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug</value>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">QtProjectManager.QMakeBuildStep</value>
+      <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">false</value>
+      <valuelist type="QVariantList" key="QtProjectManager.QMakeBuildStep.SelectedAbis"/>
+     </valuemap>
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.1">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">2</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Build</value>
+    </valuemap>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.1">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+      <value type="QString" key="Qt4ProjectManager.MakeStep.MakeArguments">clean</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Clean</value>
+    </valuemap>
+    <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">2</value>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.CustomParsers"/>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ParseStandardOutput">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges"/>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Debug</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>
+    <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">2</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Release</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Release</value>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">QtProjectManager.QMakeBuildStep</value>
+      <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">false</value>
+      <valuelist type="QVariantList" key="QtProjectManager.QMakeBuildStep.SelectedAbis"/>
+     </valuemap>
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.1">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">2</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Build</value>
+    </valuemap>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.1">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+      <value type="QString" key="Qt4ProjectManager.MakeStep.MakeArguments">clean</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Clean</value>
+    </valuemap>
+    <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">2</value>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.CustomParsers"/>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ParseStandardOutput">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges"/>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Release</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>
+    <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">0</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.2">
+    <value type="int" key="EnableQmlDebugging">0</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Profile</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Profile</value>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">QtProjectManager.QMakeBuildStep</value>
+      <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">false</value>
+      <valuelist type="QVariantList" key="QtProjectManager.QMakeBuildStep.SelectedAbis"/>
+     </valuemap>
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.1">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">2</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Build</value>
+    </valuemap>
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.1">
+     <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
+      <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
+      <value type="QString" key="Qt4ProjectManager.MakeStep.MakeArguments">clean</value>
+     </valuemap>
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Clean</value>
+    </valuemap>
+    <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">2</value>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.CustomParsers"/>
+    <value type="bool" key="ProjectExplorer.BuildConfiguration.ParseStandardOutput">false</value>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges"/>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Profile</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>
+    <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">0</value>
+    <value type="int" key="SeparateDebugInfo">0</value>
+   </valuemap>
+   <value type="qlonglong" key="ProjectExplorer.Target.BuildConfigurationCount">3</value>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.DeployConfiguration.0">
+    <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
+     <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">0</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Deploy</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Deploy</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Deploy</value>
+    </valuemap>
+    <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">1</value>
+    <valuemap type="QVariantMap" key="ProjectExplorer.DeployConfiguration.CustomData"/>
+    <value type="bool" key="ProjectExplorer.DeployConfiguration.CustomDataEnabled">false</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.DefaultDeployConfiguration</value>
+   </valuemap>
+   <value type="qlonglong" key="ProjectExplorer.Target.DeployConfigurationCount">1</value>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.0">
+    <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.QmlProfiler.Settings.UseGlobalSettings">true</value>
+    <value type="int" key="Analyzer.Valgrind.Callgrind.CostFormat">0</value>
+    <value type="bool" key="Analyzer.Valgrind.Settings.UseGlobalSettings">true</value>
+    <valuelist type="QVariantList" key="CustomOutputParsers"/>
+    <value type="int" key="PE.EnvironmentAspect.Base">2</value>
+    <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
+    <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
+    <value type="QString" key="PerfRecordArgsId">-e cpu-cycles --call-graph dwarf,4096 -F 250</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/gulsara/code/tsc/src/gui/untitled/untitled.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/gulsara/code/tsc/src/gui/untitled/untitled.pro</value>
+    <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">false</value>
+    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
+    <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug</value>
+   </valuemap>
+   <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
+  </valuemap>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.TargetCount</variable>
+  <value type="qlonglong">1</value>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.Updater.FileVersion</variable>
+  <value type="int">22</value>
+ </data>
+ <data>
+  <variable>Version</variable>
+  <value type="int">22</value>
+ </data>
+</qtcreator>
+
+
+--------------------------------------------------
+
+Path: ./snake_widget.cpp
+Contents:
+#include "snake_widget.h"
+
+Snake_Widget::Snake_Widget(QWidget *parent) : QWidget{parent} {
+    setFixedSize(350, 400);
+    setWindowTitle("Snake");
+    timer = new QTimer;
+
+    connect(timer, &QTimer::timeout, this, &Snake_Widget::update_draw);
+    timer->start(1);
+
+}
+
+void Snake_Widget::paintEvent(QPaintEvent *e) {
+    Q_UNUSED(e)
+    QPainter p(this);
+    GameInfo_t inf = controller.updateCurrentState();
+    int **field = inf.field;
+    int size = 20;
+    Snake_state state = controller.get_state();
+
+    if (state == INIT || state == PAUSE || state == GAME_OVER) {
+        print_welcome(p, state);
+    } else {
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH; j++) {
+                int res = field[i][j];
+
+                if ((res != 0 && field[i][j] == 0) || field[i][j] != 0) {
+                    p.setBrush(Qt::black);
+                } else if (res == 1) {
+                    p.setBrush(Qt::red);
+                } else if (res == 2) {
+                    p.setBrush(Qt::cyan);
+                } else if (res == 3) {
+                    p.setBrush(Qt::blue);
+                } else if (res == 4) {
+                    p.setBrush(Qt::yellow);
+                } else if (res == 5) {
+                    p.setBrush(Qt::white);
+                } else if (res == 6) {
+                    p.setBrush(Qt::green);
+                } else if (res == 7) {
+                    p.setBrush(Qt::magenta);
+                }
+
+                p.drawRect(size * j, size * i, size, size);
+            }
+        }
+    }
+}
+
+void Snake_Widget::print_welcome(QPainter &p, Snake_state state) {
+    p.save();
+    p.setRenderHint(QPainter::Antialiasing);
+    QRect r = rect();
+
+    // фон (полупрозрачный затемняющий)
+    p.fillRect(r, QColor(0, 0, 0, 160));
+
+    // заголовок
+    QFont titleF("Arial", 48, QFont::Bold);
+    p.setFont(titleF);
+    p.setPen(Qt::white);
+    QRect titleRect = r.adjusted(20, r.height() / 6, -20, -r.height() / 2);
+
+    // инструкции
+    QFont subF("Arial", 14);
+    p.setFont(subF);
+    QRect subRect = r.adjusted(20, r.height() / 2, -20, -20);
+    if (state == INIT) {
+        p.drawText(titleRect, Qt::AlignCenter, "TETRIS");
+        p.drawText(subRect, Qt::AlignCenter,
+                   "Нажмите n чтобы начать\nWASD — перемещение, f — поворот");
+    } else if (state == GAME_OVER) {
+        p.drawText(titleRect, Qt::AlignCenter, "GAME_OVER");
+        p.drawText(
+            subRect, Qt::AlignCenter,
+            "Нажмите n чтобы начать сначала\nWASD — перемещение, f — поворот");
+    } else if (state == PAUSE) {
+        p.drawText(titleRect, Qt::AlignCenter, "PAUSE");
+        p.drawText(subRect, Qt::AlignCenter,
+                   "Нажмите p чтобы начать\nWASD — перемещение, f — поворот");
+    }
+    p.restore();
+}
+
+void Snake_Widget::keyPressEvent(QKeyEvent *e) {
+    UserAction_t action = (UserAction_t) NONE_ACTION;
+    switch (e->key()) {
+        case Qt::Key_P:
+            action = Pause;
+            break;
+        case Qt::Key_N:
+            action = Start;
+            break;
+        case Qt::Key_Q:
+            action = Terminate;
+            break;
+        case Qt::Key_A:
+            action = Left;
+            break;
+        case Qt::Key_D:
+            action = Right;
+            break;
+        case Qt::Key_W:
+            action = Up;
+            break;
+        case Qt::Key_S:
+            action = Down;
+            break;
+        case Qt::Key_F:
+            action = Action;
+            break;
+        default:
+            // action = (UserAction_t)NONE_ACTION;
+            break;
+    }
+
+    controller.userInput(action, false);
+
+    // update_draw();
+    if (action == Terminate) {
+        QWidget::close();
+    }
+}
+
+void Snake_Widget::update_draw() {
+    controller.userInput((UserAction_t) NONE_ACTION, true);
+    repaint();
+}
+
+void Snake_Widget::closeEvent(QCloseEvent *event) {
+    emit finished_snake();
+    QWidget::closeEvent(event);
+}
+
+--------------------------------------------------
+
+Path: ./tetris_widget.cpp
+Contents:
+#include "tetris_widget.h"
+
+Tetris_Widget::Tetris_Widget(QWidget* parent) : QWidget{parent} {
+  setFixedSize(350, 400);
+  setWindowTitle("TETRIS");
+  timer = new QTimer;
+
+  connect(timer, &QTimer::timeout, this, &Tetris_Widget::update_draw);
+  timer->start(1);
+
+  data = get_data();
+}
+Tetris_Widget::~Tetris_Widget() { delete timer; }
+
+void Tetris_Widget::paintEvent(QPaintEvent* e) {
+  Q_UNUSED(e)
+  QPainter p(this);
+  GameInfo_t inf = updateCurrentState();
+  int** field = inf.field;
+  int** next = get_data()->current_tetraMino.tmp_current_figure_on_field;
+  int size = 20;
+
+  if (data->current_state == STATE_INITIALIZE ||
+      data->current_state == STATE_PAUSE ||
+      data->current_state == STATE_GAME_OVER) {
+    print_welcome(p, data->current_state);
+  } else {
+    print_game(p, field, next, size);
+    print_next(p, data->current_tetraMino.next_type, size);
+    print_info(p, inf.level, inf.score, inf.high_score, size);
+  }
+}
+
+void Tetris_Widget::print_welcome(QPainter& p, Tetris_state_t state) {
+  p.save();
+  p.setRenderHint(QPainter::Antialiasing);
+  QRect r = rect();
+
+  // фон (полупрозрачный затемняющий)
+  p.fillRect(r, QColor(0, 0, 0, 160));
+
+  // заголовок
+  QFont titleF("Arial", 48, QFont::Bold);
+  p.setFont(titleF);
+  p.setPen(Qt::white);
+  QRect titleRect = r.adjusted(20, r.height() / 6, -20, -r.height() / 2);
+
+  // инструкции
+  QFont subF("Arial", 14);
+  p.setFont(subF);
+  QRect subRect = r.adjusted(20, r.height() / 2, -20, -20);
+  if (state == STATE_INITIALIZE) {
+    p.drawText(titleRect, Qt::AlignCenter, "TETRIS");
+    p.drawText(subRect, Qt::AlignCenter,
+               "Нажмите n чтобы начать\nWASD — перемещение, f — поворот");
+  } else if (state == STATE_GAME_OVER) {
+    p.drawText(titleRect, Qt::AlignCenter, "GAME_OVER");
+    p.drawText(
+        subRect, Qt::AlignCenter,
+        "Нажмите n чтобы начать сначала\nWASD — перемещение, f — поворот");
+  } else if (state == STATE_PAUSE) {
+    p.drawText(titleRect, Qt::AlignCenter, "PAUSE");
+    p.drawText(subRect, Qt::AlignCenter,
+               "Нажмите p чтобы начать\nWASD — перемещение, f — поворот");
+  }
+  p.restore();
+}
+
+void Tetris_Widget::print_game(QPainter& p, int** field, int** next, int size) {
+  // for (int i{}; i < HEIGHT; ++i) {
+  //     for (int j{}; j < WIDTH; ++j) {
+  //         int res = field[i][j] + next[i][j];
+  //         if (!((res != 0 && field[i][j] == 0) || field[i][j] != 0)) {
+  //             p.setBrush(Qt::black);
+  //         } else if (res == 1) {
+  //             p.setBrush(Qt::red);
+  //         } else if (res == 2) {
+  //             p.setBrush(Qt::cyan);
+  //         } else if (res == 3) {
+  //             p.setBrush(Qt::blue);
+  //         } else if (res == 4) {
+  //             p.setBrush(Qt::yellow);
+  //         } else if (res == 5) {
+  //             p.setBrush(Qt::white);
+  //         } else if (res == 6) {
+  //             p.setBrush(Qt::green);
+  //         } else if (res == 7) {
+  //             p.setBrush(Qt::magenta);
+  //         }
+  //         p.drawRect(size * j, size * i, size, size);
+  //     }
+  // }
+  p.save();
+  p.setRenderHint(QPainter::Antialiasing);
+  p.setRenderHint(QPainter::SmoothPixmapTransform);
+  // По умолчанию не рисуем контур при заполнении, потом рисуем контур отдельно
+  p.setPen(Qt::NoPen);
+
+  for (int i = 0; i < HEIGHT; ++i) {
+    for (int j = 0; j < WIDTH; ++j) {
+      // Правильное наложение: если есть в поле — берем его, иначе берем next
+      int value = (field[i][j] != 0) ? field[i][j] : next[i][j];
+
+      QRect cellRect(qreal(size * j), qreal(size * i), qreal(size),
+                     qreal(size));
+      paint_tetramino(cellRect, value, p, size);
+    }
+  }
+
+  p.restore();
+}
+
+void Tetris_Widget::paint_tetramino(QRectF cellRect, int value, QPainter& p,
+                                    int size) {
+  const qreal radius = size * 0.18;
+  const qreal borderWidth = qMax(1.0, size * 0.06);
+  if (value == 0) {
+    // фон клетки (чтобы было видно сетку) — чуть темнее
+    QLinearGradient bgGrad(cellRect.topLeft(), cellRect.bottomRight());
+    bgGrad.setColorAt(0.0, QColor(15, 15, 20));
+    bgGrad.setColorAt(1.0, QColor(8, 8, 12));
+    p.setBrush(bgGrad);
+    p.drawRect(cellRect);
+    return;
+  }
+
+  QColor base = colorForType(value + 1);
+
+  // тень под блоком (смещение и полупрозрачность)
+  QRectF shadowRect = cellRect.translated(size * 0.06, size * 0.06);
+  p.setBrush(QColor(0, 0, 0, 90));
+  p.setPen(Qt::NoPen);
+  p.drawRoundedRect(shadowRect, radius, radius);
+
+  // основной градиент блока — светлее сверху и темнее снизу
+  QLinearGradient grad(cellRect.topLeft(), cellRect.bottomRight());
+  grad.setColorAt(0.0, base.lighter(135));  // верх — светлее
+  grad.setColorAt(0.6, base);
+  grad.setColorAt(1.0, base.darker(140));  // низ — темнее
+  p.setBrush(grad);
+  p.drawRoundedRect(cellRect, radius, radius);
+
+  // контур блока — чуть темнее базового цвета
+  QPen pen(base.darker(170));
+  pen.setWidthF(borderWidth);
+  pen.setJoinStyle(Qt::RoundJoin);
+  p.setPen(pen);
+  p.setBrush(Qt::NoBrush);
+  p.drawRoundedRect(cellRect.adjusted(borderWidth / 2, borderWidth / 2,
+                                      -borderWidth / 2, -borderWidth / 2),
+                    radius, radius);
+
+  // верхняя светлая полоска — имитация блика
+  p.setPen(Qt::NoPen);
+  QRectF topStripe(cellRect.left() + size * 0.12, cellRect.top() + size * 0.08,
+                   cellRect.width() - size * 0.24, cellRect.height() * 0.28);
+  QLinearGradient stripeGrad(topStripe.topLeft(), topStripe.bottomLeft());
+  stripeGrad.setColorAt(0.0, QColor(255, 255, 255, 180));
+  stripeGrad.setColorAt(1.0, QColor(255, 255, 255, 40));
+  p.setBrush(stripeGrad);
+  p.drawRoundedRect(topStripe, radius * 0.6, radius * 0.6);
+}
+
+QColor Tetris_Widget::colorForType(int type) const {
+  switch (type) {
+    case 1:
+      return QColor(10, 10, 10);  // 0 — пусто / фон клетки
+    case 2:
+      return QColor(200, 40, 40);  // 1 — красный
+    case 3:
+      return QColor(60, 200, 200);  // 2 — cyan
+    case 4:
+      return QColor(50, 80, 240);  // 3 — синий
+    case 5:
+      return QColor(240, 220, 60);  // 4 — желтый
+    case 6:
+      return QColor(240, 240, 240);  // 5 — белый / светлый
+    case 7:
+      return QColor(70, 200, 70);  // 6 — зеленый
+    default:
+      return QColor(200, 60, 200);  // 7 — magenta
+  }
+}
+void Tetris_Widget::print_next(QPainter& p, int type, int size) {
+  int coords[8] = {};
+  generateTetraminoShape(coords, COMPLETE, type);
+  const int nextCols = 8;
+  const int nextRows = 2;
+  const int offsetCols = 10;  // отступ в клетках по ширине
+  const int offsetRows = 7;  // отступ в клетках по высоте
+
+  const int x0 =
+      offsetCols * size;  // пиксельная координата левого верхнего угла
+  const int y0 = offsetRows * size;
+
+  QRect nextRect(x0, y0, size * nextCols, size * nextRows);
+  p.save();
+  p.setRenderHint(QPainter::Antialiasing);
+  p.setRenderHint(QPainter::SmoothPixmapTransform);
+  // По умолчанию не рисуем контур при заполнении, потом рисуем контур отдельно
+  p.setPen(Qt::NoPen);
+
+  p.drawRect(nextRect);
+  p.restore();
+
+  // заголовок "NEXT" сверху (над полем)
+  p.setPen(Qt::black);
+  QFont f = p.font();
+  f.setBold(true);
+  p.setFont(f);
+  // Центрируем текст по ширине nextRect, отрисовываем чуть выше
+  p.drawText(
+      QRect(nextRect.left(), nextRect.top() - size, nextRect.width(), size),
+      Qt::AlignCenter, QStringLiteral("NEXT"));
+
+  // рисуем тетрамино по координатам (ожидаем 1-based координаты)
+  QColor fill = colorForType(type);
+  p.setPen(Qt::black);
+  p.setBrush(fill);
+
+  for (int i = 0; i < 8; i += 2) {
+    int x = coords[i];  // ожидание 1..10
+    int y = coords[i + 1] + 1;  // у вас в ncurses вы делали +5 — сохранил
+                                // поведение (если не нужно, уберите +5)
+    // проверка границ (как у вас)
+    if (x < 1 || x > nextCols || y < 1 || y > nextRows) {
+      // при ошибке — можно отобразить текст в окне
+      p.setPen(Qt::red);
+      p.drawText(nextRect.adjusted(2, 2, -2, -2), Qt::AlignLeft | Qt::AlignTop,
+                 QString("smth wrong\nx:%1 y:%2").arg(x).arg(y));
+      continue;
+    }
+
+    int gridCol = x - 1;
+    int gridRow = y - 1;
+
+    QRect cell(nextRect.left() + gridCol * size,
+               nextRect.top() + gridRow * size, size, size);
+
+    paint_tetramino(cell, type, p, size);
+  }
+}
+
+void Tetris_Widget::print_info(QPainter& p, int level, int score,
+                               int high_score, int size) {
+  p.setRenderHint(QPainter::TextAntialiasing);
+  // Подготовка метрик для позиционирования "строк"
+  QFont font = p.font();
+  font.setBold(true);
+  p.setFont(font);
+  QFontMetrics fm(font);
+  const int lineHeight = fm.height();
+  const int leftCol =
+      10 * size;  // эквивалент mvwprintw(..., col = 2) с отступом в пикселях
+  const int topOffset = 10;  // пространство сверху
+
+  // helper для вычисления y по номеру строки (1-based как в ncurses коде)
+  auto yOfRow = [&](int row) -> int {
+    // учитываем, что в original используется строки 1..8, интервал ~1 line
+    return topOffset + (row - 1) * lineHeight;
+  };
+  QColor m_labelColorHigh{QColor("#00BFFF")};   // high_score
+  QColor m_labelColorScore{QColor("#00C000")};  // score
+  QColor m_labelColorLevel{QColor("#FFBF00")};  // level
+  int m_highScore = high_score;
+  int m_score = score;
+  int m_level = level;
+  // high_score (цвет m_labelColorHigh)
+  p.setPen(m_labelColorHigh);
+  p.drawText(leftCol, yOfRow(1) + fm.ascent(), QStringLiteral("high_score:"));
+
+  p.setPen(m_labelColorHigh.darker(140));  // значение чуть темнее/контрастнее
+  p.drawText(leftCol, yOfRow(2) + fm.ascent(),
+             QString::number(qMax(m_highScore, m_score)));
+
+  // score
+  p.setPen(m_labelColorScore);
+  p.drawText(leftCol, yOfRow(4) + fm.ascent(), QStringLiteral("score:"));
+
+  p.setPen(m_labelColorScore.darker(140));
+  p.drawText(leftCol, yOfRow(5) + fm.ascent(), QString::number(m_score));
+
+  // level
+  p.setPen(m_labelColorLevel);
+  p.drawText(leftCol, yOfRow(7) + fm.ascent(), QStringLiteral("level:"));
+
+  p.setPen(m_labelColorLevel.darker(140));
+  p.drawText(leftCol, yOfRow(8) + fm.ascent(), QString::number(m_level));
+}
+
+// using namespace :Qt;
+void Tetris_Widget::keyPressEvent(QKeyEvent* e) {
+  UserAction_t action = (UserAction_t)NONE_ACTION;
+  switch (e->key()) {
+    case Qt::Key_P:
+      action = Pause;
+      break;
+    case Qt::Key_N:
+      action = Start;
+      break;
+    case Qt::Key_Q:
+      action = Terminate;
+      break;
+    case Qt::Key_A:
+      action = Left;
+      break;
+    case Qt::Key_D:
+      action = Right;
+      break;
+    case Qt::Key_W:
+      action = Up;
+      break;
+    case Qt::Key_S:
+      action = Down;
+      break;
+    case Qt::Key_F:
+      action = Action;
+      break;
+    default:
+      // action = (UserAction_t)NONE_ACTION;
+      break;
+  }
+  get_data()->current_action = action;
+  userInput(action, false);
+  countTime(&get_data()->shift_timer);
+  // update_draw();
+  if (action == Terminate) {
+    QWidget::close();
+  }
+}
+void Tetris_Widget::update_draw() {
+  userInput((UserAction_t)NONE_ACTION, true);
+  repaint();
+}
+
+void Tetris_Widget::closeEvent(QCloseEvent* event) {
+  emit finished();
+  *data = init_empty_data();
+  QWidget::closeEvent(event);
+}
+
+--------------------------------------------------
+
+Path: ./build/Desktop-Debug/moc_snake_widget.cpp
+Contents:
+/****************************************************************************
+** Meta object code from reading C++ file 'snake_widget.h'
+**
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.13)
+**
+** WARNING! All changes made in this file will be lost!
+*****************************************************************************/
+
+#include <memory>
+#include "../../snake_widget.h"
+#include <QtCore/qbytearray.h>
+#include <QtCore/qmetatype.h>
+#if !defined(Q_MOC_OUTPUT_REVISION)
+#error "The header file 'snake_widget.h' doesn't include <QObject>."
+#elif Q_MOC_OUTPUT_REVISION != 67
+#error "This file was generated using the moc from 5.15.13. It"
+#error "cannot be used with the include files from this version of Qt."
+#error "(The moc has changed too much.)"
+#endif
+
+QT_BEGIN_MOC_NAMESPACE
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
+struct qt_meta_stringdata_Snake_Widget_t {
+    QByteArrayData data[4];
+    char stringdata0[41];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_Snake_Widget_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_Snake_Widget_t qt_meta_stringdata_Snake_Widget = {
+    {
+QT_MOC_LITERAL(0, 0, 12), // "Snake_Widget"
+QT_MOC_LITERAL(1, 13, 14), // "finished_snake"
+QT_MOC_LITERAL(2, 28, 0), // ""
+QT_MOC_LITERAL(3, 29, 11) // "update_draw"
+
+    },
+    "Snake_Widget\0finished_snake\0\0update_draw"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_Snake_Widget[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       2,   14, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       1,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    0,   24,    2, 0x06 /* Public */,
+
+ // slots: name, argc, parameters, tag, flags
+       3,    0,   25,    2, 0x08 /* Private */,
+
+ // signals: parameters
+    QMetaType::Void,
+
+ // slots: parameters
+    QMetaType::Void,
+
+       0        // eod
+};
+
+void Snake_Widget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<Snake_Widget *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->finished_snake(); break;
+        case 1: _t->update_draw(); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (Snake_Widget::*)();
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Snake_Widget::finished_snake)) {
+                *result = 0;
+                return;
+            }
+        }
+    }
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject Snake_Widget::staticMetaObject = { {
+    QMetaObject::SuperData::link<QWidget::staticMetaObject>(),
+    qt_meta_stringdata_Snake_Widget.data,
+    qt_meta_data_Snake_Widget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *Snake_Widget::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *Snake_Widget::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_Snake_Widget.stringdata0))
+        return static_cast<void*>(this);
+    return QWidget::qt_metacast(_clname);
+}
+
+int Snake_Widget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QWidget::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 2)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 2;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 2)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 2;
+    }
+    return _id;
+}
+
+// SIGNAL 0
+void Snake_Widget::finished_snake()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
+}
+QT_WARNING_POP
+QT_END_MOC_NAMESPACE
+
+--------------------------------------------------
+
+Path: ./build/Desktop-Debug/moc_predefs.h
+Contents:
+#define __DBL_MIN_EXP__ (-1021)
+#define __cpp_nontype_template_parameter_auto 201606L
+#define __UINT_LEAST16_MAX__ 0xffff
+#define __FLT16_HAS_QUIET_NAN__ 1
+#define __ATOMIC_ACQUIRE 2
+#define __FLT128_MAX_10_EXP__ 4932
+#define __FLT_MIN__ 1.17549435082228750796873653722224568e-38F
+#define __GCC_IEC_559_COMPLEX 2
+#define __cpp_aggregate_nsdmi 201304L
+#define __UINT_LEAST8_TYPE__ unsigned char
+#define __SIZEOF_FLOAT80__ 16
+#define __BFLT16_DENORM_MIN__ 9.18354961579912115600575419704879436e-41BF16
+#define __INTMAX_C(c) c ## L
+#define __CHAR_BIT__ 8
+#define __UINT8_MAX__ 0xff
+#define __SCHAR_WIDTH__ 8
+#define __WINT_MAX__ 0xffffffffU
+#define __FLT32_MIN_EXP__ (-125)
+#define __cpp_static_assert 201411L
+#define __BFLT16_MIN_10_EXP__ (-37)
+#define __ORDER_LITTLE_ENDIAN__ 1234
+#define __WCHAR_MAX__ 0x7fffffff
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 1
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 1
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8 1
+#define __GCC_ATOMIC_CHAR_LOCK_FREE 2
+#define __GCC_IEC_559 2
+#define __FLT32X_DECIMAL_DIG__ 17
+#define __FLT_EVAL_METHOD__ 0
+#define __cpp_binary_literals 201304L
+#define __FLT64_DECIMAL_DIG__ 17
+#define __CET__ 3
+#define __cpp_noexcept_function_type 201510L
+#define __GCC_ATOMIC_CHAR32_T_LOCK_FREE 2
+#define __cpp_variadic_templates 200704L
+#define __UINT_FAST64_MAX__ 0xffffffffffffffffUL
+#define __SIG_ATOMIC_TYPE__ int
+#define __DBL_MIN_10_EXP__ (-307)
+#define __FINITE_MATH_ONLY__ 0
+#define __cpp_variable_templates 201304L
+#define __FLT32X_MAX_EXP__ 1024
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1 1
+#define __FLT32_HAS_DENORM__ 1
+#define __UINT_FAST8_MAX__ 0xff
+#define __cpp_rvalue_reference 200610L
+#define __cpp_nested_namespace_definitions 201411L
+#define __DEC64_MAX_EXP__ 385
+#define __INT8_C(c) c
+#define __LDBL_HAS_INFINITY__ 1
+#define __INT_LEAST8_WIDTH__ 8
+#define __cpp_variadic_using 201611L
+#define __UINT_LEAST64_MAX__ 0xffffffffffffffffUL
+#define __INT_LEAST8_MAX__ 0x7f
+#define __cpp_attributes 200809L
+#define __cpp_capture_star_this 201603L
+#define __SHRT_MAX__ 0x7fff
+#define __LDBL_MAX__ 1.18973149535723176502126385303097021e+4932L
+#define __FLT64X_MAX_10_EXP__ 4932
+#define __cpp_if_constexpr 201606L
+#define __BFLT16_MAX_10_EXP__ 38
+#define __BFLT16_MAX_EXP__ 128
+#define __LDBL_IS_IEC_60559__ 1
+#define __FLT64X_HAS_QUIET_NAN__ 1
+#define __UINT_LEAST8_MAX__ 0xff
+#define __GCC_ATOMIC_BOOL_LOCK_FREE 2
+#define __FLT128_DENORM_MIN__ 6.47517511943802511092443895822764655e-4966F128
+#define __UINTMAX_TYPE__ long unsigned int
+#define __cpp_nsdmi 200809L
+#define __BFLT16_DECIMAL_DIG__ 4
+#define __linux 1
+#define __DEC32_EPSILON__ 1E-6DF
+#define __FLT_EVAL_METHOD_TS_18661_3__ 0
+#define __UINT32_MAX__ 0xffffffffU
+#define __GXX_EXPERIMENTAL_CXX0X__ 1
+#define __DBL_DENORM_MIN__ double(4.94065645841246544176568792868221372e-324L)
+#define __FLT128_MIN_EXP__ (-16381)
+#define __WINT_MIN__ 0U
+#define __FLT128_MIN_10_EXP__ (-4931)
+#define __FLT32X_IS_IEC_60559__ 1
+#define __INT_LEAST16_WIDTH__ 16
+#define __SCHAR_MAX__ 0x7f
+#define __FLT128_MANT_DIG__ 113
+#define __WCHAR_MIN__ (-__WCHAR_MAX__ - 1)
+#define __INT64_C(c) c ## L
+#define __SSP_STRONG__ 3
+#define __GCC_ATOMIC_POINTER_LOCK_FREE 2
+#define __ATOMIC_SEQ_CST 5
+#define __unix 1
+#define __INT_LEAST64_MAX__ 0x7fffffffffffffffL
+#define __FLT32X_MANT_DIG__ 53
+#define __GCC_ATOMIC_CHAR16_T_LOCK_FREE 2
+#define __cpp_aligned_new 201606L
+#define __FLT32_MAX_10_EXP__ 38
+#define __FLT64X_EPSILON__ 1.08420217248550443400745280086994171e-19F64x
+#define __STDC_HOSTED__ 1
+#define __DEC64_MIN_EXP__ (-382)
+#define __cpp_decltype_auto 201304L
+#define __DBL_DIG__ 15
+#define __FLT_EPSILON__ 1.19209289550781250000000000000000000e-7F
+#define __GXX_WEAK__ 1
+#define __SHRT_WIDTH__ 16
+#define __FLT32_IS_IEC_60559__ 1
+#define __LDBL_MIN__ 3.36210314311209350626267781732175260e-4932L
+#define __DBL_IS_IEC_60559__ 1
+#define __DEC32_MAX__ 9.999999E96DF
+#define __cpp_threadsafe_static_init 200806L
+#define __cpp_enumerator_attributes 201411L
+#define __FLT64X_DENORM_MIN__ 3.64519953188247460252840593361941982e-4951F64x
+#define __FLT32X_HAS_INFINITY__ 1
+#define __unix__ 1
+#define __INT_WIDTH__ 32
+#define __STDC_IEC_559__ 1
+#define __STDC_ISO_10646__ 201706L
+#define __DECIMAL_DIG__ 21
+#define __STDC_IEC_559_COMPLEX__ 1
+#define __FLT64_EPSILON__ 2.22044604925031308084726333618164062e-16F64
+#define __gnu_linux__ 1
+#define __INT16_MAX__ 0x7fff
+#define __FLT64_MIN_EXP__ (-1021)
+#define __FLT64X_MIN_10_EXP__ (-4931)
+#define __LDBL_HAS_QUIET_NAN__ 1
+#define __cpp_return_type_deduction 201304L
+#define __FLT16_MIN_EXP__ (-13)
+#define __FLT64_MANT_DIG__ 53
+#define __FLT64X_MANT_DIG__ 64
+#define __BFLT16_DIG__ 2
+#define __GNUC__ 13
+#define __GXX_RTTI 1
+#define __pie__ 2
+#define __MMX__ 1
+#define __FLT_HAS_DENORM__ 1
+#define __SIZEOF_LONG_DOUBLE__ 16
+#define __BIGGEST_ALIGNMENT__ 16
+#define __STDC_UTF_16__ 1
+#define __FLT64_MAX_10_EXP__ 308
+#define __BFLT16_IS_IEC_60559__ 0
+#define __FLT16_MAX_10_EXP__ 4
+#define __cpp_delegating_constructors 200604L
+#define __DBL_MAX__ double(1.79769313486231570814527423731704357e+308L)
+#define __cpp_raw_strings 200710L
+#define __INT_FAST32_MAX__ 0x7fffffffffffffffL
+#define __DBL_HAS_INFINITY__ 1
+#define __INT64_MAX__ 0x7fffffffffffffffL
+#define __SIZEOF_FLOAT__ 4
+#define __HAVE_SPECULATION_SAFE_VALUE 1
+#define __cpp_fold_expressions 201603L
+#define __DEC32_MIN_EXP__ (-94)
+#define __INTPTR_WIDTH__ 64
+#define __UINT_LEAST32_MAX__ 0xffffffffU
+#define __FLT32X_HAS_DENORM__ 1
+#define __INT_FAST16_TYPE__ long int
+#define __MMX_WITH_SSE__ 1
+#define __LDBL_HAS_DENORM__ 1
+#define __SEG_GS 1
+#define __BFLT16_EPSILON__ 7.81250000000000000000000000000000000e-3BF16
+#define __cplusplus 201703L
+#define __cpp_ref_qualifiers 200710L
+#define __DEC32_MIN__ 1E-95DF
+#define __DEPRECATED 1
+#define __cpp_rvalue_references 200610L
+#define __DBL_MAX_EXP__ 1024
+#define __WCHAR_WIDTH__ 32
+#define __FLT32_MAX__ 3.40282346638528859811704183484516925e+38F32
+#define __DEC128_EPSILON__ 1E-33DL
+#define __FLT16_DECIMAL_DIG__ 5
+#define __SSE2_MATH__ 1
+#define __ATOMIC_HLE_RELEASE 131072
+#define __PTRDIFF_MAX__ 0x7fffffffffffffffL
+#define __amd64 1
+#define __ATOMIC_HLE_ACQUIRE 65536
+#define __GNUG__ 13
+#define __LONG_LONG_MAX__ 0x7fffffffffffffffLL
+#define __SIZEOF_SIZE_T__ 8
+#define __BFLT16_HAS_INFINITY__ 1
+#define __FLT64X_MIN_EXP__ (-16381)
+#define __SIZEOF_WINT_T__ 4
+#define __FLT32X_DIG__ 15
+#define __LONG_LONG_WIDTH__ 64
+#define __cpp_initializer_lists 200806L
+#define __FLT32_MAX_EXP__ 128
+#define __cpp_hex_float 201603L
+#define __GXX_ABI_VERSION 1018
+#define __FLT_MIN_EXP__ (-125)
+#define __GCC_HAVE_DWARF2_CFI_ASM 1
+#define __x86_64 1
+#define __cpp_lambdas 200907L
+#define __INT_FAST64_TYPE__ long int
+#define __BFLT16_MAX__ 3.38953138925153547590470800371487867e+38BF16
+#define __FLT64_DENORM_MIN__ 4.94065645841246544176568792868221372e-324F64
+#define __cpp_template_auto 201606L
+#define __FLT16_DENORM_MIN__ 5.96046447753906250000000000000000000e-8F16
+#define __FLT128_EPSILON__ 1.92592994438723585305597794258492732e-34F128
+#define __FLT64X_NORM_MAX__ 1.18973149535723176502126385303097021e+4932F64x
+#define __SIZEOF_POINTER__ 8
+#define __SIZE_TYPE__ long unsigned int
+#define __LP64__ 1
+#define __DBL_HAS_QUIET_NAN__ 1
+#define __FLT32X_EPSILON__ 2.22044604925031308084726333618164062e-16F32x
+#define __LDBL_MAX_EXP__ 16384
+#define __DECIMAL_BID_FORMAT__ 1
+#define __FLT64_MIN_10_EXP__ (-307)
+#define __FLT16_MIN_10_EXP__ (-4)
+#define __FLT64X_DECIMAL_DIG__ 21
+#define __DEC128_MIN__ 1E-6143DL
+#define __REGISTER_PREFIX__ 
+#define __UINT16_MAX__ 0xffff
+#define __FLT128_HAS_INFINITY__ 1
+#define __FLT32_MIN__ 1.17549435082228750796873653722224568e-38F32
+#define __UINT8_TYPE__ unsigned char
+#define __FLT_DIG__ 6
+#define __NO_INLINE__ 1
+#define __DEC_EVAL_METHOD__ 2
+#define __FLT_MANT_DIG__ 24
+#define __LDBL_DECIMAL_DIG__ 21
+#define __VERSION__ "13.3.0"
+#define __UINT64_C(c) c ## UL
+#define __cpp_unicode_characters 201411L
+#define _STDC_PREDEF_H 1
+#define __INT_LEAST32_MAX__ 0x7fffffff
+#define __GCC_ATOMIC_INT_LOCK_FREE 2
+#define __FLT128_MAX_EXP__ 16384
+#define __FLT32_MANT_DIG__ 24
+#define __FLOAT_WORD_ORDER__ __ORDER_LITTLE_ENDIAN__
+#define __FLT32X_MIN_EXP__ (-1021)
+#define __STDC_IEC_60559_COMPLEX__ 201404L
+#define __cpp_aggregate_bases 201603L
+#define __BFLT16_MIN__ 1.17549435082228750796873653722224568e-38BF16
+#define __FLT128_HAS_DENORM__ 1
+#define __FLT32_DECIMAL_DIG__ 9
+#define __FLT128_DIG__ 33
+#define __INT32_C(c) c
+#define __DEC64_EPSILON__ 1E-15DD
+#define __ORDER_PDP_ENDIAN__ 3412
+#define __DEC128_MIN_EXP__ (-6142)
+#define __DEC128_MAX__ 9.999999999999999999999999999999999E6144DL
+#define __INT_FAST32_TYPE__ long int
+#define __UINT_LEAST16_TYPE__ short unsigned int
+#define __DEC128_MAX_EXP__ 6145
+#define unix 1
+#define __DBL_HAS_DENORM__ 1
+#define __cpp_rtti 199711L
+#define __UINT64_MAX__ 0xffffffffffffffffUL
+#define __FLT_IS_IEC_60559__ 1
+#define __GNUC_WIDE_EXECUTION_CHARSET_NAME "UTF-32LE"
+#define __FLT64X_DIG__ 18
+#define __INT8_TYPE__ signed char
+#define __cpp_digit_separators 201309L
+#define __ELF__ 1
+#define __GCC_ASM_FLAG_OUTPUTS__ 1
+#define __UINT32_TYPE__ unsigned int
+#define __BFLT16_HAS_QUIET_NAN__ 1
+#define __FLT_RADIX__ 2
+#define __INT_LEAST16_TYPE__ short int
+#define __LDBL_EPSILON__ 1.08420217248550443400745280086994171e-19L
+#define __UINTMAX_C(c) c ## UL
+#define __FLT16_DIG__ 3
+#define __k8 1
+#define __FLT32X_MIN__ 2.22507385850720138309023271733240406e-308F32x
+#define __SIG_ATOMIC_MAX__ 0x7fffffff
+#define __cpp_constexpr 201603L
+#define __GCC_ATOMIC_WCHAR_T_LOCK_FREE 2
+#define __USER_LABEL_PREFIX__ 
+#define __STDC_IEC_60559_BFP__ 201404L
+#define __SIZEOF_PTRDIFF_T__ 8
+#define __FLT64X_HAS_INFINITY__ 1
+#define __SIZEOF_LONG__ 8
+#define __LDBL_DIG__ 18
+#define __FLT64_IS_IEC_60559__ 1
+#define __x86_64__ 1
+#define __FLT16_IS_IEC_60559__ 1
+#define __FLT16_MAX_EXP__ 16
+#define __DEC32_SUBNORMAL_MIN__ 0.000001E-95DF
+#define __INT_FAST16_MAX__ 0x7fffffffffffffffL
+#define __GCC_CONSTRUCTIVE_SIZE 64
+#define __FLT64_DIG__ 15
+#define __UINT_FAST32_MAX__ 0xffffffffffffffffUL
+#define __UINT_LEAST64_TYPE__ long unsigned int
+#define __FLT16_EPSILON__ 9.76562500000000000000000000000000000e-4F16
+#define __FLT_HAS_QUIET_NAN__ 1
+#define __FLT_MAX_10_EXP__ 38
+#define __LONG_MAX__ 0x7fffffffffffffffL
+#define __FLT64X_HAS_DENORM__ 1
+#define __DEC128_SUBNORMAL_MIN__ 0.000000000000000000000000000000001E-6143DL
+#define __FLT_HAS_INFINITY__ 1
+#define __GNUC_EXECUTION_CHARSET_NAME "UTF-8"
+#define __cpp_unicode_literals 200710L
+#define __UINT_FAST16_TYPE__ long unsigned int
+#define __DEC64_MAX__ 9.999999999999999E384DD
+#define __INT_FAST32_WIDTH__ 64
+#define __CHAR16_TYPE__ short unsigned int
+#define __PRAGMA_REDEFINE_EXTNAME 1
+#define __SIZE_WIDTH__ 64
+#define __SEG_FS 1
+#define __INT_LEAST16_MAX__ 0x7fff
+#define __FLT16_NORM_MAX__ 6.55040000000000000000000000000000000e+4F16
+#define __DEC64_MANT_DIG__ 16
+#define __FLT32_DENORM_MIN__ 1.40129846432481707092372958328991613e-45F32
+#define __SIG_ATOMIC_WIDTH__ 32
+#define __INT_LEAST64_TYPE__ long int
+#define __INT16_TYPE__ short int
+#define __INT_LEAST8_TYPE__ signed char
+#define __FLT16_MAX__ 6.55040000000000000000000000000000000e+4F16
+#define __FLT128_MIN__ 3.36210314311209350626267781732175260e-4932F128
+#define __cpp_structured_bindings 201606L
+#define __SIZEOF_INT__ 4
+#define __DEC32_MAX_EXP__ 97
+#define __INT_FAST8_MAX__ 0x7f
+#define __FLT128_MAX__ 1.18973149535723176508575932662800702e+4932F128
+#define __INTPTR_MAX__ 0x7fffffffffffffffL
+#define __cpp_sized_deallocation 201309L
+#define __cpp_guaranteed_copy_elision 201606L
+#define linux 1
+#define __FLT64_HAS_QUIET_NAN__ 1
+#define __FLT32_MIN_10_EXP__ (-37)
+#define __EXCEPTIONS 1
+#define __UINT16_C(c) c
+#define __PTRDIFF_WIDTH__ 64
+#define __LDBL_MANT_DIG__ 64
+#define __cpp_range_based_for 201603L
+#define __INT_FAST16_WIDTH__ 64
+#define __FLT64_HAS_INFINITY__ 1
+#define __FLT64X_MAX__ 1.18973149535723176502126385303097021e+4932F64x
+#define __FLT16_HAS_INFINITY__ 1
+#define __STDCPP_DEFAULT_NEW_ALIGNMENT__ 16
+#define __SIG_ATOMIC_MIN__ (-__SIG_ATOMIC_MAX__ - 1)
+#define __code_model_small__ 1
+#define __GCC_ATOMIC_LONG_LOCK_FREE 2
+#define __cpp_nontype_template_args 201411L
+#define __DEC32_MANT_DIG__ 7
+#define __k8__ 1
+#define __INTPTR_TYPE__ long int
+#define __UINT16_TYPE__ short unsigned int
+#define __WCHAR_TYPE__ int
+#define __pic__ 2
+#define __UINTPTR_MAX__ 0xffffffffffffffffUL
+#define __INT_FAST64_WIDTH__ 64
+#define __cpp_decltype 200707L
+#define __INT_FAST64_MAX__ 0x7fffffffffffffffL
+#define __GCC_ATOMIC_TEST_AND_SET_TRUEVAL 1
+#define __FLT_NORM_MAX__ 3.40282346638528859811704183484516925e+38F
+#define __FLT32_HAS_INFINITY__ 1
+#define __FLT64X_MAX_EXP__ 16384
+#define __UINT_FAST64_TYPE__ long unsigned int
+#define __cpp_inline_variables 201606L
+#define __BFLT16_MIN_EXP__ (-125)
+#define __INT_MAX__ 0x7fffffff
+#define __linux__ 1
+#define __INT64_TYPE__ long int
+#define __FLT_MAX_EXP__ 128
+#define __ORDER_BIG_ENDIAN__ 4321
+#define __DBL_MANT_DIG__ 53
+#define __cpp_inheriting_constructors 201511L
+#define __SIZEOF_FLOAT128__ 16
+#define __BFLT16_MANT_DIG__ 8
+#define __DEC64_MIN__ 1E-383DD
+#define __WINT_TYPE__ unsigned int
+#define __UINT_LEAST32_TYPE__ unsigned int
+#define __SIZEOF_SHORT__ 2
+#define __FLT32_NORM_MAX__ 3.40282346638528859811704183484516925e+38F32
+#define __SSE__ 1
+#define __LDBL_MIN_EXP__ (-16381)
+#define __FLT64_MAX__ 1.79769313486231570814527423731704357e+308F64
+#define __amd64__ 1
+#define __WINT_WIDTH__ 32
+#define __INT_LEAST64_WIDTH__ 64
+#define __FLT32X_MAX_10_EXP__ 308
+#define __cpp_namespace_attributes 201411L
+#define __SIZEOF_INT128__ 16
+#define __FLT16_MIN__ 6.10351562500000000000000000000000000e-5F16
+#define __FLT64X_IS_IEC_60559__ 1
+#define __LDBL_MAX_10_EXP__ 4932
+#define __ATOMIC_RELAXED 0
+#define __DBL_EPSILON__ double(2.22044604925031308084726333618164062e-16L)
+#define __INT_LEAST32_TYPE__ int
+#define _LP64 1
+#define __UINT8_C(c) c
+#define __FLT64_MAX_EXP__ 1024
+#define __SIZEOF_WCHAR_T__ 4
+#define __GNUC_PATCHLEVEL__ 0
+#define __FLT128_NORM_MAX__ 1.18973149535723176508575932662800702e+4932F128
+#define __FLT64_NORM_MAX__ 1.79769313486231570814527423731704357e+308F64
+#define __FLT128_HAS_QUIET_NAN__ 1
+#define __INTMAX_MAX__ 0x7fffffffffffffffL
+#define __INT_FAST8_TYPE__ signed char
+#define __FLT64X_MIN__ 3.36210314311209350626267781732175260e-4932F64x
+#define __STDCPP_THREADS__ 1
+#define __BFLT16_HAS_DENORM__ 1
+#define __GNUC_STDC_INLINE__ 1
+#define __FLT64_HAS_DENORM__ 1
+#define __FLT32_EPSILON__ 1.19209289550781250000000000000000000e-7F32
+#define __FLT16_HAS_DENORM__ 1
+#define __DBL_DECIMAL_DIG__ 17
+#define __STDC_UTF_32__ 1
+#define __INT_FAST8_WIDTH__ 8
+#define __FXSR__ 1
+#define __FLT32X_MAX__ 1.79769313486231570814527423731704357e+308F32x
+#define __DBL_NORM_MAX__ double(1.79769313486231570814527423731704357e+308L)
+#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
+#define __GCC_DESTRUCTIVE_SIZE 64
+#define __INTMAX_WIDTH__ 64
+#define __cpp_runtime_arrays 198712L
+#define __FLT32_DIG__ 6
+#define __UINT64_TYPE__ long unsigned int
+#define __UINT32_C(c) c ## U
+#define __cpp_alias_templates 200704L
+#define __FLT_DENORM_MIN__ 1.40129846432481707092372958328991613e-45F
+#define __FLT128_IS_IEC_60559__ 1
+#define __INT8_MAX__ 0x7f
+#define __LONG_WIDTH__ 64
+#define __DBL_MIN__ double(2.22507385850720138309023271733240406e-308L)
+#define __PIC__ 2
+#define __INT32_MAX__ 0x7fffffff
+#define __UINT_FAST32_TYPE__ long unsigned int
+#define __FLT16_MANT_DIG__ 11
+#define __FLT32X_NORM_MAX__ 1.79769313486231570814527423731704357e+308F32x
+#define __CHAR32_TYPE__ unsigned int
+#define __FLT_MAX__ 3.40282346638528859811704183484516925e+38F
+#define __SSE2__ 1
+#define __cpp_deduction_guides 201703L
+#define __BFLT16_NORM_MAX__ 3.38953138925153547590470800371487867e+38BF16
+#define __INT32_TYPE__ int
+#define __SIZEOF_DOUBLE__ 8
+#define __cpp_exceptions 199711L
+#define __FLT_MIN_10_EXP__ (-37)
+#define __FLT64_MIN__ 2.22507385850720138309023271733240406e-308F64
+#define __INT_LEAST32_WIDTH__ 32
+#define __INTMAX_TYPE__ long int
+#define __GLIBCXX_BITSIZE_INT_N_0 128
+#define __FLT32X_HAS_QUIET_NAN__ 1
+#define __ATOMIC_CONSUME 1
+#define __GNUC_MINOR__ 3
+#define __GLIBCXX_TYPE_INT_N_0 __int128
+#define __UINTMAX_MAX__ 0xffffffffffffffffUL
+#define __PIE__ 2
+#define __FLT32X_DENORM_MIN__ 4.94065645841246544176568792868221372e-324F32x
+#define __cpp_template_template_args 201611L
+#define __DBL_MAX_10_EXP__ 308
+#define __LDBL_DENORM_MIN__ 3.64519953188247460252840593361941982e-4951L
+#define __INT16_C(c) c
+#define __STDC__ 1
+#define __PTRDIFF_TYPE__ long int
+#define __FLT32X_MIN_10_EXP__ (-307)
+#define __UINTPTR_TYPE__ long unsigned int
+#define __DEC64_SUBNORMAL_MIN__ 0.000000000000001E-383DD
+#define __DEC128_MANT_DIG__ 34
+#define __LDBL_MIN_10_EXP__ (-4931)
+#define __cpp_generic_lambdas 201304L
+#define __SSE_MATH__ 1
+#define __SIZEOF_LONG_LONG__ 8
+#define __cpp_user_defined_literals 200809L
+#define __FLT128_DECIMAL_DIG__ 36
+#define __GCC_ATOMIC_LLONG_LOCK_FREE 2
+#define __FLT32_HAS_QUIET_NAN__ 1
+#define __FLT_DECIMAL_DIG__ 9
+#define __UINT_FAST16_MAX__ 0xffffffffffffffffUL
+#define __LDBL_NORM_MAX__ 1.18973149535723176502126385303097021e+4932L
+#define __GCC_ATOMIC_SHORT_LOCK_FREE 2
+#define __SIZE_MAX__ 0xffffffffffffffffUL
+#define __UINT_FAST8_TYPE__ unsigned char
+#define _GNU_SOURCE 1
+#define __cpp_init_captures 201304L
+#define __ATOMIC_ACQ_REL 4
+#define __ATOMIC_RELEASE 3
+
+--------------------------------------------------
+
+Path: ./build/Desktop-Debug/.qmake.stash
+Contents:
+QMAKE_CXX.QT_COMPILER_STDCXX = 201703L
+QMAKE_CXX.QMAKE_GCC_MAJOR_VERSION = 13
+QMAKE_CXX.QMAKE_GCC_MINOR_VERSION = 3
+QMAKE_CXX.QMAKE_GCC_PATCH_VERSION = 0
+QMAKE_CXX.COMPILER_MACROS = \
+    QT_COMPILER_STDCXX \
+    QMAKE_GCC_MAJOR_VERSION \
+    QMAKE_GCC_MINOR_VERSION \
+    QMAKE_GCC_PATCH_VERSION
+QMAKE_CXX.INCDIRS = \
+    /usr/include/c++/13 \
+    /usr/include/x86_64-linux-gnu/c++/13 \
+    /usr/include/c++/13/backward \
+    /usr/lib/gcc/x86_64-linux-gnu/13/include \
+    /usr/local/include \
+    /usr/include/x86_64-linux-gnu \
+    /usr/include
+QMAKE_CXX.LIBDIRS = \
+    /usr/lib/gcc/x86_64-linux-gnu/13 \
+    /usr/lib/x86_64-linux-gnu \
+    /usr/lib \
+    /lib/x86_64-linux-gnu \
+    /lib
+
+--------------------------------------------------
+
+Path: ./build/Desktop-Debug/moc_tetris_widget.cpp
+Contents:
+/****************************************************************************
+** Meta object code from reading C++ file 'tetris_widget.h'
+**
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.13)
+**
+** WARNING! All changes made in this file will be lost!
+*****************************************************************************/
+
+#include <memory>
+#include "../../tetris_widget.h"
+#include <QtCore/qbytearray.h>
+#include <QtCore/qmetatype.h>
+#if !defined(Q_MOC_OUTPUT_REVISION)
+#error "The header file 'tetris_widget.h' doesn't include <QObject>."
+#elif Q_MOC_OUTPUT_REVISION != 67
+#error "This file was generated using the moc from 5.15.13. It"
+#error "cannot be used with the include files from this version of Qt."
+#error "(The moc has changed too much.)"
+#endif
+
+QT_BEGIN_MOC_NAMESPACE
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
+struct qt_meta_stringdata_Tetris_Widget_t {
+    QByteArrayData data[4];
+    char stringdata0[36];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_Tetris_Widget_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_Tetris_Widget_t qt_meta_stringdata_Tetris_Widget = {
+    {
+QT_MOC_LITERAL(0, 0, 13), // "Tetris_Widget"
+QT_MOC_LITERAL(1, 14, 8), // "finished"
+QT_MOC_LITERAL(2, 23, 0), // ""
+QT_MOC_LITERAL(3, 24, 11) // "update_draw"
+
+    },
+    "Tetris_Widget\0finished\0\0update_draw"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_Tetris_Widget[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       2,   14, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       1,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    0,   24,    2, 0x06 /* Public */,
+
+ // slots: name, argc, parameters, tag, flags
+       3,    0,   25,    2, 0x08 /* Private */,
+
+ // signals: parameters
+    QMetaType::Void,
+
+ // slots: parameters
+    QMetaType::Void,
+
+       0        // eod
+};
+
+void Tetris_Widget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<Tetris_Widget *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->finished(); break;
+        case 1: _t->update_draw(); break;
+        default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (Tetris_Widget::*)();
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Tetris_Widget::finished)) {
+                *result = 0;
+                return;
+            }
+        }
+    }
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject Tetris_Widget::staticMetaObject = { {
+    QMetaObject::SuperData::link<QWidget::staticMetaObject>(),
+    qt_meta_stringdata_Tetris_Widget.data,
+    qt_meta_data_Tetris_Widget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *Tetris_Widget::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *Tetris_Widget::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_Tetris_Widget.stringdata0))
+        return static_cast<void*>(this);
+    return QWidget::qt_metacast(_clname);
+}
+
+int Tetris_Widget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QWidget::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 2)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 2;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 2)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 2;
+    }
+    return _id;
+}
+
+// SIGNAL 0
+void Tetris_Widget::finished()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
+}
+QT_WARNING_POP
+QT_END_MOC_NAMESPACE
+
+--------------------------------------------------
+
+Path: ./build/Desktop-Debug/highscore_tetris.txt
+Contents:
+600
+--------------------------------------------------
+
+Path: ./build/Desktop-Debug/moc_mainwindow.cpp
+Contents:
+/****************************************************************************
+** Meta object code from reading C++ file 'mainwindow.h'
+**
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.13)
+**
+** WARNING! All changes made in this file will be lost!
+*****************************************************************************/
+
+#include <memory>
+#include "../../mainwindow.h"
+#include <QtCore/qbytearray.h>
+#include <QtCore/qmetatype.h>
+#if !defined(Q_MOC_OUTPUT_REVISION)
+#error "The header file 'mainwindow.h' doesn't include <QObject>."
+#elif Q_MOC_OUTPUT_REVISION != 67
+#error "This file was generated using the moc from 5.15.13. It"
+#error "cannot be used with the include files from this version of Qt."
+#error "(The moc has changed too much.)"
+#endif
+
+QT_BEGIN_MOC_NAMESPACE
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
+struct qt_meta_stringdata_MainWindow_t {
+    QByteArrayData data[4];
+    char stringdata0[37];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_MainWindow_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_MainWindow_t qt_meta_stringdata_MainWindow = {
+    {
+QT_MOC_LITERAL(0, 0, 10), // "MainWindow"
+QT_MOC_LITERAL(1, 11, 12), // "start_tetris"
+QT_MOC_LITERAL(2, 24, 0), // ""
+QT_MOC_LITERAL(3, 25, 11) // "start_snake"
+
+    },
+    "MainWindow\0start_tetris\0\0start_snake"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_MainWindow[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       2,   14, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
+
+ // slots: name, argc, parameters, tag, flags
+       1,    0,   24,    2, 0x08 /* Private */,
+       3,    0,   25,    2, 0x08 /* Private */,
+
+ // slots: parameters
+    QMetaType::Void,
+    QMetaType::Void,
+
+       0        // eod
+};
+
+void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        auto *_t = static_cast<MainWindow *>(_o);
+        (void)_t;
+        switch (_id) {
+        case 0: _t->start_tetris(); break;
+        case 1: _t->start_snake(); break;
+        default: ;
+        }
+    }
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject MainWindow::staticMetaObject = { {
+    QMetaObject::SuperData::link<QMainWindow::staticMetaObject>(),
+    qt_meta_stringdata_MainWindow.data,
+    qt_meta_data_MainWindow,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *MainWindow::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *MainWindow::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_MainWindow.stringdata0))
+        return static_cast<void*>(this);
+    return QMainWindow::qt_metacast(_clname);
+}
+
+int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QMainWindow::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 2)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 2;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 2)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 2;
+    }
+    return _id;
+}
+QT_WARNING_POP
+QT_END_MOC_NAMESPACE
+
+--------------------------------------------------
+
+Path: ./build/Desktop-Debug/Makefile
+Contents:
+#############################################################################
+# Makefile for building: untitled
+# Generated by qmake (3.1) (Qt 5.15.13)
+# Project:  ../../untitled.pro
+# Template: app
+# Command: /usr/lib/qt5/bin/qmake -o Makefile ../../untitled.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
+#############################################################################
+
+MAKEFILE      = Makefile
+
+EQ            = =
+
+####### Compiler, tools and options
+
+CC            = gcc
+CXX           = g++
+DEFINES       = -DQT_QML_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+CFLAGS        = -pipe -g -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -g -std=gnu++1z -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
+INCPATH       = -I../../../untitled -I. -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
+QMAKE         = /usr/lib/qt5/bin/qmake
+DEL_FILE      = rm -f
+CHK_DIR_EXISTS= test -d
+MKDIR         = mkdir -p
+COPY          = cp -f
+COPY_FILE     = cp -f
+COPY_DIR      = cp -f -R
+INSTALL_FILE  = install -m 644 -p
+INSTALL_PROGRAM = install -m 755 -p
+INSTALL_DIR   = cp -f -R
+QINSTALL      = /usr/lib/qt5/bin/qmake -install qinstall
+QINSTALL_PROGRAM = /usr/lib/qt5/bin/qmake -install qinstall -exe
+DEL_FILE      = rm -f
+SYMLINK       = ln -f -s
+DEL_DIR       = rmdir
+MOVE          = mv -f
+TAR           = tar -cf
+COMPRESS      = gzip -9f
+DISTNAME      = untitled1.0.0
+DISTDIR = /home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.tmp/untitled1.0.0
+LINK          = g++
+LFLAGS        = 
+LIBS          = $(SUBLIBS) /usr/lib/x86_64-linux-gnu/libQt5Widgets.so /usr/lib/x86_64-linux-gnu/libQt5Gui.so /usr/lib/x86_64-linux-gnu/libQt5Core.so -lGL -lpthread   
+AR            = ar cqs
+RANLIB        = 
+SED           = sed
+STRIP         = strip
+
+####### Output directory
+
+OBJECTS_DIR   = ./
+
+####### Files
+
+SOURCES       = ../../../../brick_game/brick_game.c \
+		../../../../brick_game/snake/controller/controller.cpp \
+		../../../../brick_game/snake/model/Snake.cpp \
+		../../../../brick_game/tetris/src/TGM3Randomizer.c \
+		../../../../brick_game/tetris/src/field_mechanics.c \
+		../../../../brick_game/tetris/src/game_api.c \
+		../../../../brick_game/tetris/src/game_rules.c \
+		../../../../brick_game/tetris/src/game_state_management.c \
+		../../../../brick_game/tetris/src/tetramino.c \
+		../../../../brick_game/tetris/src/tetramino_movement.c \
+		../../../../brick_game/utils/timer.c \
+		../../../../brick_game/utils/utilities.c \
+		../../main.cpp \
+		../../mainwindow.cpp \
+		../../snake_widget.cpp \
+		../../tetris_widget.cpp moc_mainwindow.cpp \
+		moc_snake_widget.cpp \
+		moc_tetris_widget.cpp
+OBJECTS       = brick_game.o \
+		controller.o \
+		Snake.o \
+		TGM3Randomizer.o \
+		field_mechanics.o \
+		game_api.o \
+		game_rules.o \
+		game_state_management.o \
+		tetramino.o \
+		tetramino_movement.o \
+		timer.o \
+		utilities.o \
+		main.o \
+		mainwindow.o \
+		snake_widget.o \
+		tetris_widget.o \
+		moc_mainwindow.o \
+		moc_snake_widget.o \
+		moc_tetris_widget.o
+DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/sanitize.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base-unix.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-base.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-unix.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/qconfig.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_devicediscovery_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_edid_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_egl_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfs_kms_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfsdeviceintegration_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fb_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_glx_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_input_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_kms_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_service_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_theme_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_vulkan_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xkbcommon_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_functions.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		../../.qmake.stash \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resolve_config.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_post.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qml_debug.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/warn_on.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources_functions.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/moc.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/uic.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/thread.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qmake_use.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/file_copies.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/testcase_targets.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
+		../../../../untitled.pro ../../../../brick_game/brick_game.h \
+		../../../../brick_game/snake/controller/controller.h \
+		../../../../brick_game/snake/model/Snake.h \
+		../../../../brick_game/tetris/inc/tetramino_movement.h \
+		../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/utils/timer.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../mainwindow.h \
+		../../snake_widget.h \
+		../../tetris_widget.h ../../../../brick_game/brick_game.c \
+		../../../../brick_game/snake/controller/controller.cpp \
+		../../../../brick_game/snake/model/Snake.cpp \
+		../../../../brick_game/tetris/src/TGM3Randomizer.c \
+		../../../../brick_game/tetris/src/field_mechanics.c \
+		../../../../brick_game/tetris/src/game_api.c \
+		../../../../brick_game/tetris/src/game_rules.c \
+		../../../../brick_game/tetris/src/game_state_management.c \
+		../../../../brick_game/tetris/src/tetramino.c \
+		../../../../brick_game/tetris/src/tetramino_movement.c \
+		../../../../brick_game/utils/timer.c \
+		../../../../brick_game/utils/utilities.c \
+		../../main.cpp \
+		../../mainwindow.cpp \
+		../../snake_widget.cpp \
+		../../tetris_widget.cpp
+QMAKE_TARGET  = untitled
+DESTDIR       = 
+TARGET        = untitled
+
+
+first: all
+####### Build rules
+
+untitled: ui_mainwindow.h $(OBJECTS)  
+	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
+
+Makefile: ../../untitled.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/sanitize.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base-unix.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-base.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-unix.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/qconfig.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_devicediscovery_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_edid_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_egl_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfs_kms_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfsdeviceintegration_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fb_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_glx_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_input_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_kms_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_service_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_theme_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_vulkan_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xkbcommon_support_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml_private.pri \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_functions.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resolve_config.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_post.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qml_debug.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/warn_on.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources_functions.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/moc.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/uic.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/thread.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qmake_use.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/file_copies.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/testcase_targets.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
+		../../untitled.pro
+	$(QMAKE) -o Makefile ../../untitled.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/sanitize.conf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base.conf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/gcc-base-unix.conf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-base.conf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-unix.conf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/qconfig.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_core_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_dbus_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_devicediscovery_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_edid_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_egl_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfs_kms_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eglfsdeviceintegration_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fb_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_fontdatabase_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_glx_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_gui_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_input_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_kms_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_network_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_opengl_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_openglextensions_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_platformcompositor_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_printsupport_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_service_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_sql_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_testlib_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_theme_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_vulkan_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_widgets_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xkbcommon_support_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_xml_private.pri:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_functions.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resolve_config.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_post.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qml_debug.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/warn_on.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources_functions.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/resources.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/moc.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/opengl.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/uic.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/unix/thread.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qmake_use.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/file_copies.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/testcase_targets.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf:
+/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf:
+../../untitled.pro:
+qmake: FORCE
+	@$(QMAKE) -o Makefile ../../untitled.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
+
+qmake_all: FORCE
+
+
+all: Makefile untitled
+
+dist: distdir FORCE
+	(cd `dirname $(DISTDIR)` && $(TAR) $(DISTNAME).tar $(DISTNAME) && $(COMPRESS) $(DISTNAME).tar) && $(MOVE) `dirname $(DISTDIR)`/$(DISTNAME).tar.gz . && $(DEL_FILE) -r $(DISTDIR)
+
+distdir: FORCE
+	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
+	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
+	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../../../brick_game/brick_game.h ../../../../brick_game/snake/controller/controller.h ../../../../brick_game/snake/model/Snake.h ../../../../brick_game/tetris/inc/tetramino_movement.h ../../../../brick_game/tetris/inc/tetris.h ../../../../brick_game/utils/timer.h ../../../../brick_game/utils/defines.h ../../../../brick_game/utils/utilities.h ../../mainwindow.h ../../snake_widget.h ../../tetris_widget.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../../../brick_game/brick_game.c ../../../../brick_game/snake/controller/controller.cpp ../../../../brick_game/snake/model/Snake.cpp ../../../../brick_game/tetris/src/TGM3Randomizer.c ../../../../brick_game/tetris/src/field_mechanics.c ../../../../brick_game/tetris/src/game_api.c ../../../../brick_game/tetris/src/game_rules.c ../../../../brick_game/tetris/src/game_state_management.c ../../../../brick_game/tetris/src/tetramino.c ../../../../brick_game/tetris/src/tetramino_movement.c ../../../../brick_game/utils/timer.c ../../../../brick_game/utils/utilities.c ../../main.cpp ../../mainwindow.cpp ../../snake_widget.cpp ../../tetris_widget.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../mainwindow.ui $(DISTDIR)/
+
+
+clean: compiler_clean 
+	-$(DEL_FILE) $(OBJECTS)
+	-$(DEL_FILE) *~ core *.core
+
+
+distclean: clean 
+	-$(DEL_FILE) $(TARGET) 
+	-$(DEL_FILE) .qmake.stash
+	-$(DEL_FILE) Makefile
+
+
+####### Sub-libraries
+
+mocclean: compiler_moc_header_clean compiler_moc_objc_header_clean compiler_moc_source_clean
+
+mocables: compiler_moc_header_make_all compiler_moc_objc_header_make_all compiler_moc_source_make_all
+
+check: first
+
+benchmark: first
+
+compiler_rcc_make_all:
+compiler_rcc_clean:
+compiler_moc_predefs_make_all: moc_predefs.h
+compiler_moc_predefs_clean:
+	-$(DEL_FILE) moc_predefs.h
+moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
+	g++ -pipe -g -std=gnu++1z -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
+
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_snake_widget.cpp moc_tetris_widget.cpp
+compiler_moc_header_clean:
+	-$(DEL_FILE) moc_mainwindow.cpp moc_snake_widget.cpp moc_tetris_widget.cpp
+moc_mainwindow.cpp: ../../mainwindow.h \
+		../../snake_widget.h \
+		../../../../brick_game/snake/controller/controller.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/timer.h \
+		../../../../brick_game/snake/model/Snake.h \
+		../../../../brick_game/utils/defines.h \
+		../../tetris_widget.h \
+		../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/utils/utilities.h \
+		ui_mainwindow.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/gulsara/code/tsc/src/gui/untitled -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../mainwindow.h -o moc_mainwindow.cpp
+
+moc_snake_widget.cpp: ../../snake_widget.h \
+		../../../../brick_game/snake/controller/controller.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/timer.h \
+		../../../../brick_game/snake/model/Snake.h \
+		../../../../brick_game/utils/defines.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/gulsara/code/tsc/src/gui/untitled -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../snake_widget.h -o moc_snake_widget.cpp
+
+moc_tetris_widget.cpp: ../../tetris_widget.h \
+		../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/utils/timer.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/gulsara/code/tsc/src/gui/untitled -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../tetris_widget.h -o moc_tetris_widget.cpp
+
+compiler_moc_objc_header_make_all:
+compiler_moc_objc_header_clean:
+compiler_moc_source_make_all:
+compiler_moc_source_clean:
+compiler_uic_make_all: ui_mainwindow.h
+compiler_uic_clean:
+	-$(DEL_FILE) ui_mainwindow.h
+ui_mainwindow.h: ../../mainwindow.ui \
+		/usr/lib/qt5/bin/uic
+	/usr/lib/qt5/bin/uic ../../mainwindow.ui -o ui_mainwindow.h
+
+compiler_yacc_decl_make_all:
+compiler_yacc_decl_clean:
+compiler_yacc_impl_make_all:
+compiler_yacc_impl_clean:
+compiler_lex_make_all:
+compiler_lex_clean:
+compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
+
+####### Compile
+
+brick_game.o: ../../../../brick_game/brick_game.c ../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o brick_game.o ../../../../brick_game/brick_game.c
+
+controller.o: ../../../../brick_game/snake/controller/controller.cpp ../../../../brick_game/snake/controller/controller.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/timer.h \
+		../../../../brick_game/snake/model/Snake.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o controller.o ../../../../brick_game/snake/controller/controller.cpp
+
+Snake.o: ../../../../brick_game/snake/model/Snake.cpp ../../../../brick_game/snake/model/Snake.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Snake.o ../../../../brick_game/snake/model/Snake.cpp
+
+TGM3Randomizer.o: ../../../../brick_game/tetris/src/TGM3Randomizer.c ../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/timer.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o TGM3Randomizer.o ../../../../brick_game/tetris/src/TGM3Randomizer.c
+
+field_mechanics.o: ../../../../brick_game/tetris/src/field_mechanics.c ../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/utils/timer.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o field_mechanics.o ../../../../brick_game/tetris/src/field_mechanics.c
+
+game_api.o: ../../../../brick_game/tetris/src/game_api.c ../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/utils/timer.h \
+		../../../../brick_game/tetris/inc/tetramino_movement.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o game_api.o ../../../../brick_game/tetris/src/game_api.c
+
+game_rules.o: ../../../../brick_game/tetris/src/game_rules.c ../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/utils/timer.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o game_rules.o ../../../../brick_game/tetris/src/game_rules.c
+
+game_state_management.o: ../../../../brick_game/tetris/src/game_state_management.c ../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/utils/timer.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o game_state_management.o ../../../../brick_game/tetris/src/game_state_management.c
+
+tetramino.o: ../../../../brick_game/tetris/src/tetramino.c ../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/utils/timer.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o tetramino.o ../../../../brick_game/tetris/src/tetramino.c
+
+tetramino_movement.o: ../../../../brick_game/tetris/src/tetramino_movement.c ../../../../brick_game/tetris/inc/tetramino_movement.h \
+		../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/utils/timer.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o tetramino_movement.o ../../../../brick_game/tetris/src/tetramino_movement.c
+
+timer.o: ../../../../brick_game/utils/timer.c ../../../../brick_game/utils/timer.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o timer.o ../../../../brick_game/utils/timer.c
+
+utilities.o: ../../../../brick_game/utils/utilities.c ../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/timer.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o utilities.o ../../../../brick_game/utils/utilities.c
+
+main.o: ../../main.cpp ../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/utils/timer.h \
+		../../mainwindow.h \
+		../../snake_widget.h \
+		../../../../brick_game/snake/controller/controller.h \
+		../../../../brick_game/snake/model/Snake.h \
+		../../tetris_widget.h \
+		ui_mainwindow.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../main.cpp
+
+mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
+		../../snake_widget.h \
+		../../../../brick_game/snake/controller/controller.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/timer.h \
+		../../../../brick_game/snake/model/Snake.h \
+		../../../../brick_game/utils/defines.h \
+		../../tetris_widget.h \
+		../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/utils/utilities.h \
+		ui_mainwindow.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../../mainwindow.cpp
+
+snake_widget.o: ../../snake_widget.cpp ../../snake_widget.h \
+		../../../../brick_game/snake/controller/controller.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/timer.h \
+		../../../../brick_game/snake/model/Snake.h \
+		../../../../brick_game/utils/defines.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o snake_widget.o ../../snake_widget.cpp
+
+tetris_widget.o: ../../tetris_widget.cpp ../../tetris_widget.h \
+		../../../../brick_game/tetris/inc/tetris.h \
+		../../../../brick_game/brick_game.h \
+		../../../../brick_game/utils/defines.h \
+		../../../../brick_game/utils/utilities.h \
+		../../../../brick_game/utils/timer.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tetris_widget.o ../../tetris_widget.cpp
+
+moc_mainwindow.o: moc_mainwindow.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
+
+moc_snake_widget.o: moc_snake_widget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_snake_widget.o moc_snake_widget.cpp
+
+moc_tetris_widget.o: moc_tetris_widget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_tetris_widget.o moc_tetris_widget.cpp
+
+####### Install
+
+install_target: first FORCE
+	@test -d $(INSTALL_ROOT)/opt/untitled/bin || mkdir -p $(INSTALL_ROOT)/opt/untitled/bin
+	$(QINSTALL_PROGRAM) $(QMAKE_TARGET) $(INSTALL_ROOT)/opt/untitled/bin/$(QMAKE_TARGET)
+
+uninstall_target: FORCE
+	-$(DEL_FILE) $(INSTALL_ROOT)/opt/untitled/bin/$(QMAKE_TARGET)
+	-$(DEL_DIR) $(INSTALL_ROOT)/opt/untitled/bin/ 
+
+
+install: install_target  FORCE
+
+uninstall: uninstall_target  FORCE
+
+FORCE:
+
+
+--------------------------------------------------
+
+Path: ./build/Desktop-Debug/ui_mainwindow.h
+Contents:
+/********************************************************************************
+** Form generated from reading UI file 'mainwindow.ui'
+**
+** Created by: Qt User Interface Compiler version 5.15.13
+**
+** WARNING! All changes made in this file will be lost when recompiling UI file!
+********************************************************************************/
+
+#ifndef UI_MAINWINDOW_H
+#define UI_MAINWINDOW_H
+
+#include <QtCore/QVariant>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QWidget>
+
+QT_BEGIN_NAMESPACE
+
+class Ui_MainWindow
+{
+public:
+    QWidget *centralwidget;
+    QMenuBar *menubar;
+    QStatusBar *statusbar;
+
+    void setupUi(QMainWindow *MainWindow)
+    {
+        if (MainWindow->objectName().isEmpty())
+            MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
+        MainWindow->resize(800, 600);
+        centralwidget = new QWidget(MainWindow);
+        centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
+        MainWindow->setCentralWidget(centralwidget);
+        menubar = new QMenuBar(MainWindow);
+        menubar->setObjectName(QString::fromUtf8("menubar"));
+        menubar->setGeometry(QRect(0, 0, 800, 19));
+        MainWindow->setMenuBar(menubar);
+        statusbar = new QStatusBar(MainWindow);
+        statusbar->setObjectName(QString::fromUtf8("statusbar"));
+        MainWindow->setStatusBar(statusbar);
+
+        retranslateUi(MainWindow);
+
+        QMetaObject::connectSlotsByName(MainWindow);
+    } // setupUi
+
+    void retranslateUi(QMainWindow *MainWindow)
+    {
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+    } // retranslateUi
+
+};
+
+namespace Ui {
+    class MainWindow: public Ui_MainWindow {};
+} // namespace Ui
+
+QT_END_NAMESPACE
+
+#endif // UI_MAINWINDOW_H
+
+--------------------------------------------------
+
+Path: ./build/Desktop-Debug/moc_widget.cpp
+Contents:
+/****************************************************************************
+** Meta object code from reading C++ file 'widget.h'
+**
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.13)
+**
+** WARNING! All changes made in this file will be lost!
+*****************************************************************************/
+
+#include <memory>
+#include "../../widget.h"
+#include <QtCore/qbytearray.h>
+#include <QtCore/qmetatype.h>
+#if !defined(Q_MOC_OUTPUT_REVISION)
+#error "The header file 'widget.h' doesn't include <QObject>."
+#elif Q_MOC_OUTPUT_REVISION != 67
+#error "This file was generated using the moc from 5.15.13. It"
+#error "cannot be used with the include files from this version of Qt."
+#error "(The moc has changed too much.)"
+#endif
+
+QT_BEGIN_MOC_NAMESPACE
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
+struct qt_meta_stringdata_Widget_t {
+    QByteArrayData data[1];
+    char stringdata0[7];
+};
+#define QT_MOC_LITERAL(idx, ofs, len) \
+    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
+    qptrdiff(offsetof(qt_meta_stringdata_Widget_t, stringdata0) + ofs \
+        - idx * sizeof(QByteArrayData)) \
+    )
+static const qt_meta_stringdata_Widget_t qt_meta_stringdata_Widget = {
+    {
+QT_MOC_LITERAL(0, 0, 6) // "Widget"
+
+    },
+    "Widget"
+};
+#undef QT_MOC_LITERAL
+
+static const uint qt_meta_data_Widget[] = {
+
+ // content:
+       8,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+       0,       // flags
+       0,       // signalCount
+
+       0        // eod
+};
+
+void Widget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    (void)_o;
+    (void)_id;
+    (void)_c;
+    (void)_a;
+}
+
+QT_INIT_METAOBJECT const QMetaObject Widget::staticMetaObject = { {
+    QMetaObject::SuperData::link<QWidget::staticMetaObject>(),
+    qt_meta_stringdata_Widget.data,
+    qt_meta_data_Widget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
+
+
+const QMetaObject *Widget::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *Widget::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_meta_stringdata_Widget.stringdata0))
+        return static_cast<void*>(this);
+    return QWidget::qt_metacast(_clname);
+}
+
+int Widget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QWidget::qt_metacall(_c, _id, _a);
+    return _id;
+}
+QT_WARNING_POP
+QT_END_MOC_NAMESPACE
+
+--------------------------------------------------
+
+Path: ./build/Desktop-Debug/.qtc_clangd/compile_commands.json
+Contents:
+[{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++","/home/gulsara/code/tsc/src/brick_game/snake/controller/controller.cpp"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/snake/controller/controller.cpp"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++","/home/gulsara/code/tsc/src/brick_game/snake/model/Snake.cpp"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/snake/model/Snake.cpp"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++","/home/gulsara/code/tsc/src/gui/untitled/main.cpp"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/main.cpp"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++","/home/gulsara/code/tsc/src/gui/untitled/mainwindow.cpp"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/mainwindow.cpp"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++","/home/gulsara/code/tsc/src/gui/untitled/snake_widget.cpp"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/snake_widget.cpp"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++","/home/gulsara/code/tsc/src/gui/untitled/tetris_widget.cpp"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/tetris_widget.cpp"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/brick_game/brick_game.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/brick_game.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/brick_game/snake/controller/controller.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/snake/controller/controller.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/brick_game/snake/model/Snake.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/snake/model/Snake.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/brick_game/tetris/inc/tetramino_movement.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/inc/tetramino_movement.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/brick_game/tetris/inc/tetris.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/inc/tetris.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/brick_game/utils/timer.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/utils/timer.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/brick_game/utils/defines.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/utils/defines.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/brick_game/utils/utilities.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/utils/utilities.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/gui/untitled/mainwindow.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/mainwindow.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/gui/untitled/snake_widget.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/snake_widget.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/gui/untitled/tetris_widget.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/tetris_widget.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-std=gnu++1z","-Wall","-Wextra","-D_REENTRANT","-fPIC","-fsyntax-only","-m64","--target=x86_64-linux-gnu","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/include/c++/13","-isystem","/usr/include/x86_64-linux-gnu/c++/13","-isystem","/usr/include/c++/13/backward","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c++-header","/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/ui_mainwindow.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/ui_mainwindow.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c","/home/gulsara/code/tsc/src/brick_game/brick_game.c"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/brick_game.c"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c","/home/gulsara/code/tsc/src/brick_game/tetris/src/TGM3Randomizer.c"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/src/TGM3Randomizer.c"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c","/home/gulsara/code/tsc/src/brick_game/tetris/src/field_mechanics.c"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/src/field_mechanics.c"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c","/home/gulsara/code/tsc/src/brick_game/tetris/src/game_api.c"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/src/game_api.c"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c","/home/gulsara/code/tsc/src/brick_game/tetris/src/game_rules.c"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/src/game_rules.c"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c","/home/gulsara/code/tsc/src/brick_game/tetris/src/game_state_management.c"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/src/game_state_management.c"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c","/home/gulsara/code/tsc/src/brick_game/tetris/src/tetramino.c"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/src/tetramino.c"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c","/home/gulsara/code/tsc/src/brick_game/tetris/src/tetramino_movement.c"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/src/tetramino_movement.c"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c","/home/gulsara/code/tsc/src/brick_game/utils/timer.c"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/utils/timer.c"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c","/home/gulsara/code/tsc/src/brick_game/utils/utilities.c"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/utils/utilities.c"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/brick_game/brick_game.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/brick_game.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/brick_game/snake/controller/controller.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/snake/controller/controller.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/brick_game/snake/model/Snake.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/snake/model/Snake.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/brick_game/tetris/inc/tetramino_movement.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/inc/tetramino_movement.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/brick_game/tetris/inc/tetris.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/tetris/inc/tetris.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/brick_game/utils/timer.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/utils/timer.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/brick_game/utils/defines.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/utils/defines.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/brick_game/utils/utilities.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/brick_game/utils/utilities.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/gui/untitled/mainwindow.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/mainwindow.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/gui/untitled/snake_widget.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/snake_widget.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/gui/untitled/tetris_widget.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/tetris_widget.h"},{"arguments":["clang","-Wno-documentation-unknown-command","-Wno-unknown-warning-option","-Wno-unknown-pragmas","-nostdinc","-nostdinc++","-pipe","-g","-Wall","-Wextra","-D_REENTRANT","-fsyntax-only","-m64","--target=x86_64-pc-linux-gnu","-std=gnu17","-DQT_QML_DEBUG","-DQT_WIDGETS_LIB","-DQT_GUI_LIB","-DQT_CORE_LIB","-DQ_CREATOR_RUN","-DQT_ANNOTATE_FUNCTION(x)=__attribute__((annotate(#x)))","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders","-I/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled","-I/usr/include/x86_64-linux-gnu/qt5","-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets","-I/usr/include/x86_64-linux-gnu/qt5/QtGui","-I/usr/include/x86_64-linux-gnu/qt5/QtCore","-I/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug","-I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++","-isystem","/usr/local/include","-isystem","/usr/lib/llvm-18/lib/clang/18/include","-isystem","/usr/include/x86_64-linux-gnu","-isystem","/usr/include","-fmessage-length=0","-fdiagnostics-show-note-include-stack","-fretain-comments-from-system-headers","-fmacro-backtrace-limit=0","-ferror-limit=1000","-x","c-header","/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/ui_mainwindow.h"],"directory":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/.qtc_clangd","file":"/home/gulsara/code/tsc/src/gui/untitled/build/Desktop-Debug/ui_mainwindow.h"}]
+--------------------------------------------------
+

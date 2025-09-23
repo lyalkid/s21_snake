@@ -10,6 +10,8 @@ CONFIG += c++17
 
 SOURCES += \
     ../../brick_game/brick_game.c \
+    ../../brick_game/snake/controller/controller.cpp \
+    ../../brick_game/snake/model/Snake.cpp \
     ../../brick_game/tetris/src/TGM3Randomizer.c \
     ../../brick_game/tetris/src/field_mechanics.c \
     ../../brick_game/tetris/src/game_api.c \
@@ -17,19 +19,25 @@ SOURCES += \
     ../../brick_game/tetris/src/game_state_management.c \
     ../../brick_game/tetris/src/tetramino.c \
     ../../brick_game/tetris/src/tetramino_movement.c \
-    ../../brick_game/tetris/src/timer.c \
+    ../../brick_game/utils/timer.c \
     ../../brick_game/utils/utilities.c \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    snake_widget.cpp \
+    tetris_widget.cpp
 
 HEADERS += \
     ../../brick_game/brick_game.h \
+    ../../brick_game/snake/controller/controller.h \
+    ../../brick_game/snake/model/Snake.h \
     ../../brick_game/tetris/inc/tetramino_movement.h \
     ../../brick_game/tetris/inc/tetris.h \
-    ../../brick_game/tetris/inc/timer.h \
+    ../../brick_game/utils/timer.h \
     ../../brick_game/utils/defines.h \
     ../../brick_game/utils/utilities.h \
-    mainwindow.h
+    mainwindow.h \
+    snake_widget.h \
+    tetris_widget.h
 
 FORMS += \
     mainwindow.ui

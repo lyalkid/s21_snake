@@ -1,18 +1,23 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-#include "../../brick_game/tetris/inc/tetris.h"
-#ifdef __cplusplus
-}
-#endif
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
+// #include "../../brick_game/tetris/inc/tetris.h"
+// #ifdef __cplusplus
+// }
+// #endif
+// #include <string.h>
+
 #include <QMainWindow>
-#include <QTimer>
-#include <QKeyEvent>
-#include <QPainter>
-#include <string.h>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
+
+#include "snake_widget.h"
+#include "tetris_widget.h"
+#include "ui_mainwindow.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -20,24 +25,23 @@ class MainWindow;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow {
-    Q_OBJECT
+  Q_OBJECT
 
-public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+ public:
+  MainWindow(QWidget *parent = nullptr);
+  ~MainWindow();
 
-protected:
-    void paintEvent(QPaintEvent *e) override;
-    void keyPressEvent(QKeyEvent *e) override;
+ private:
+  Ui::MainWindow *ui;
+  Tetris_Widget *tetris;
+  Snake_Widget *snake;
+  QPushButton *tetris_button;
+  QPushButton *snake_button;
+  QVBoxLayout *layout;
+  QWidget *central;
 
-private:
-    Ui::MainWindow *ui;
-    // GameField* game_field;
-    TetrisData_t* data;
-    QTimer *timer;
-
-private slots:
-    void update_draw();
-
+ private slots:
+  void start_tetris();
+  void start_snake();
 };
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H
