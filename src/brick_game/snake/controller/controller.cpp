@@ -11,7 +11,7 @@ extern "C" {
 }
 
 namespace s21 {
-    Controller::Controller(s21::Snake *snake) : paused(false), active(true), updated(false), win(false), model(snake) {
+    Controller::Controller() : paused(false), active(true), updated(false), win(false), model(new s21::Snake) {
         info = init_empty_gameInfo(2);
         null_array(info.field, HEIGHT, WIDTH);
         timer = init_shift_timer();
@@ -86,8 +86,15 @@ namespace s21 {
                 break;
 
             case Pause:
-                paused = !paused;
-                if (!paused) { state = GAME; }
+                if(state == GAME ) {
+                    paused = !paused;
+                    state = PAUSE;
+                    timer.time_to_shift = false;
+                    get_time(&timer.before);
+                }
+                if (!paused && state == PAUSE) {
+                    state = GAME;
+                }
                 // state = PAUSE;
                 break;
 

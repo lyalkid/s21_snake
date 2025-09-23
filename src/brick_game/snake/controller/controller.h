@@ -36,7 +36,7 @@ namespace s21 {
      */
     class Controller {
     public:
-        Controller(Snake *snake);
+        Controller();
 
         ~Controller() = default;
 

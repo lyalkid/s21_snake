@@ -17,36 +17,36 @@ extern "C" {
 
 using namespace s21;
 
-const char *actionToString(UserAction_t s) {
-    switch (s) {
-        case Start:
-            return "start      ";
-            break;
-        case Pause:
-            return "pause      ";
-            break;
-        case Terminate:
-            return "terminate  ";
-            break;
-        case Left:
-            return "left       ";
-            break;
-        case Right:
-            return "right      ";
-            break;
-        case Up:
-            return "up         ";
-            break;
-        case Down:
-            return "down       ";
-        case Action:
-            return "action     ";
-    }
-    return "none_action";
-}
+// const char *actionToString(UserAction_t s) {
+//     switch (s) {
+//         case Start:
+//             return "start      ";
+//             break;
+//         case Pause:
+//             return "pause      ";
+//             break;
+//         case Terminate:
+//             return "terminate  ";
+//             break;
+//         case Left:
+//             return "left       ";
+//             break;
+//         case Right:
+//             return "right      ";
+//             break;
+//         case Up:
+//             return "up         ";
+//             break;
+//         case Down:
+//             return "down       ";
+//         case Action:
+//             return "action     ";
+//     }
+//     return "none_action";
+// }
 
 void debug_info_snake(UserAction_t action, Vec2 dir, Vec2 head, bool shift, Vec2 body[], int score, int speed) {
-    mvprintw(0, 22, "action: %s", actionToString(action));
+    // mvprintw(0, 22, "action: %s", actionToString(action));
     mvprintw(1, 22, "dir:   ,   ");
     mvprintw(1, 22, "dir: %d, %d", dir.x, dir.y);
     mvprintw(4, 22, "head:   ,   ");
@@ -121,16 +121,10 @@ void draw_snake(WINDOW *win, GameInfo_t info, Snake_state state ) {
 int main() {
     init_nc();
     WINDOW *win = newwin(FIELD_Y, FIELD_X, 0, 0);
-    Snake snake{};
-    Controller controller(&snake);
+    Controller controller;
     UserAction_t action;
     while (controller.get_active()) {
-        if (controller.get_paused()) {
-            while (controller.get_paused()) {
-                action = getSignal(getch());
-                if (action == Pause)controller.userInput(action, true);
-            }
-        }
+
         action = getSignal(getch());
 
         // debug_info_snake(action, controller.get_model().getDirection(), controller.get_model().getHead(),

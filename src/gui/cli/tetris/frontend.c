@@ -67,8 +67,8 @@ void render_next_win(WINDOW *next_win, int type) {
   mvwprintw(next_win, 1, 4 * 2, "NEXT");
   mvwprintw(next_win, 2, 3 * 2, "TETRAMINO:");
 
-  int coordinates[8] = {};
-  generateTetraminoShape(coordinates, COMPLETE, type);
+    int coordinates[8] = {};
+    generateTetraminoShape(coordinates, COMPLETE, type);
 
   for (int i = 0; i < 8; i += 2) {
     int x = coordinates[i];

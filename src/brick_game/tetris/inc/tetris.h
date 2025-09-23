@@ -282,7 +282,7 @@ TetrisData_t *get_data(void);
 TetrisData_t init_empty_data(void);
 
 const char* stateToString(Tetris_state_t s);
-// const char *actionToString(UserAction_t s) ;
+const char *actionToString(UserAction_t s) ;
 void main_fsm(TetrisData_t *data, UserAction_t action);
 void game_fsm(TetrisData_t *data);
 void finish_game(TetrisData_t *data);

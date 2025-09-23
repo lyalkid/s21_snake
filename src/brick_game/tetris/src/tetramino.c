@@ -152,7 +152,7 @@ void generateShapeTJL(int coordinates[], int rotate, int type) {
 
   // TODO ПРОВЕРИТЬ на коректность в соответвии со специф tetris rotate system
   if (type == T && rotate == STRAIGHT) {
-    int coord[] = {3, 0, 4, 0, 5, 0, 4, 1};
+    int coord[] = {3, 1, 4, 1, 5, 1, 4, 2};
     setCoordinates(coordinates, coord);
 
     /* ...
@@ -161,7 +161,7 @@ void generateShapeTJL(int coordinates[], int rotate, int type) {
      *
      * */
   } else if (type == T && rotate == RIGHT) {
-    int coord[] = {3, 0, 4, 0, 4, -1, 4, 1};
+    int coord[] = {3, 1, 4, 1, 4, 0, 4, 2};
     setCoordinates(coordinates, coord);
 
     /* .#.
@@ -170,7 +170,7 @@ void generateShapeTJL(int coordinates[], int rotate, int type) {
      *
      * */
   } else if (type == T && rotate == COMPLETE) {
-    int coord[] = {3, 0, 4, 0, 5, 0, 4, -1};
+    int coord[] = {3, 1, 4, 1, 5, 1, 4, 0};
 
     setCoordinates(coordinates, coord);
 
@@ -180,7 +180,7 @@ void generateShapeTJL(int coordinates[], int rotate, int type) {
      *
      * */
   } else if (type == T && rotate == REFLEX) {
-    int coord[] = {5, 0, 4, 0, 4, -1, 4, 1};
+    int coord[] = {5, 1, 4, 1, 4, 0, 4, 2};
     setCoordinates(coordinates, coord);
 
     /* .#.

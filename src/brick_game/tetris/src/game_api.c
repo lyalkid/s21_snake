@@ -66,33 +66,33 @@ const char *stateToString(Tetris_state_t s) {
     }
 }
 
-// const char *actionToString(UserAction_t s) {
-//     switch (s) {
-//         case Start:
-//             return "start      ";
-//             break;
-//         case Pause:
-//             return "pause      ";
-//             break;
-//         case Terminate:
-//             return "terminate  ";
-//             break;
-//         case Left:
-//             return "left       ";
-//             break;
-//         case Right:
-//             return "right      ";
-//             break;
-//         case Up:
-//             return "up         ";
-//             break;
-//         case Down:
-//             return "down       ";
-//         case Action:
-//             return "action     ";
-//     }
-//     return "none_action";
-// }
+const char *actionToString(UserAction_t s) {
+    switch (s) {
+        case Start:
+            return "start      ";
+            break;
+        case Pause:
+            return "pause      ";
+            break;
+        case Terminate:
+            return "terminate  ";
+            break;
+        case Left:
+            return "left       ";
+            break;
+        case Right:
+            return "right      ";
+            break;
+        case Up:
+            return "up         ";
+            break;
+        case Down:
+            return "down       ";
+        case Action:
+            return "action     ";
+    }
+    return "none_action";
+}
 
 void userInput(UserAction_t action, bool hold) {
     TetrisData_t *data = get_data();
@@ -203,6 +203,7 @@ void finish_game(TetrisData_t *data) {
     if (data->current_state != STATE_GAME_OVER && !data->is_win)
         data->is_active = false;
      data->current_state=STATE_EXIT;
+    reset_game(data);
 }
 
 void reset_game(TetrisData_t *data) {

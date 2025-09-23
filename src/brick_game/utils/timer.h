@@ -15,7 +15,7 @@ extern "C" {
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#define TIME 750000  // 1 second
+#define TIME 1000000  // 1 second
 
 typedef struct {
   long tv_sec;
