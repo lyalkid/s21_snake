@@ -13,7 +13,7 @@
          brick_game/tetris/src/tetramino.c
          brick_game/tetris/src/tetramino_movement.c
          brick_game/utils/utilities.c
-         main_tetris.c
+         gui/cli/tetris/main_tetris.c
          brick_game/brick_game.c
          brick_game/utils/defines.h
          brick_game/utils/timer.h

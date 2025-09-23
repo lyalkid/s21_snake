@@ -36,7 +36,7 @@ desktop:
 	#mv qui/desktop/tmp/desktop build
 
 tetris_cli: $(T_CLI) $(T_LIB)
-	gcc main_tetris.c -L. libtetris.a libtcli.a -lncurses -lm -o build/t_cli
+	gcc gui/cli/tetris/main_tetris.c -L. libtetris.a libtcli.a -lncurses -lm -o build/t_cli
 
 snake_cli:
 	g++  $(SNAKE_SRC) -L. libtetris.a libtcli.a -lncurses -o build/s_cli
