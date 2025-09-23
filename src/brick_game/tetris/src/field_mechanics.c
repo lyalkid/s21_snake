@@ -5,8 +5,9 @@
  *
  */
 
+#include "../../utils/defines.h"
+#include "../../utils/utilities.h"
 #include "../inc/tetris.h"
-
 int removeFullLines(int** field, int rows, int cols) {
   int count = 0;
   int full_scan = 0;

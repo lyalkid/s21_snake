@@ -7,14 +7,16 @@
 
 #ifndef TETRIS_H
 #define TETRIS_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
 #include "../../brick_game.h"
-#include "../../utils/defines.h"
-#include "../../utils/utilities.h"
 #include "../../utils/timer.h"
 
 enum answer { YES, NO };
@@ -116,7 +118,6 @@ int index_of(const char *arr[], int size, const char *value);
 
 void next_tetramino(TGM3Randomizer *r);
 
-void print_tetramino(Tetramino tetramino);
 
 /**
  * @brief Преобразует фигуру в 2D-массив.
@@ -223,7 +224,6 @@ typedef enum {
     STATE_INITIALIZE,
     STATE_SPAWN,
     STATE_MOVEMENT ,
-
     STATE_SHIFT,
     STATE_PAUSE,
     STATE_GAME_OVER,
@@ -281,10 +281,9 @@ int canMergeFigures(int **field, int **next);
 TetrisData_t *get_data(void);
 TetrisData_t init_empty_data(void);
 
-const char* stateToString(Tetris_state_t s);
-const char *actionToString(UserAction_t s) ;
+// const char* stateToString(Tetris_state_t s);
+// const char *actionToString(UserAction_t s) ;
 void main_fsm(TetrisData_t *data, UserAction_t action);
-void game_fsm(TetrisData_t *data);
 void finish_game(TetrisData_t *data);
 void reset_game(TetrisData_t *data);
 void free_game(TetrisData_t *data);
@@ -306,6 +305,8 @@ int spawn_figure(Tetramino *tetraMino, GameInfo_t *game_info);
 void is_game_over(int* state, int status);
 int onShifting(void);
 GameInfo_t updateCurrentState();
-
+#ifdef __cplusplus
+   }
+#endif
 
 #endif  // TETRIS_H

@@ -4,8 +4,9 @@
  * @details
  *
  */
+#include "../../utils/defines.h"
+#include "../../utils/utilities.h"
 #include "../inc/tetris.h"
-
 int mergeFigureIntoField(int** next, int** field) {
   int is_all_ok_val = canMergeFigures(field, next);
   if (is_all_ok_val) {

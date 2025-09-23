@@ -7,6 +7,8 @@
 
 #include "../inc/tetramino_movement.h"
 
+#include "../../utils/defines.h"
+#include "../../utils/utilities.h"
 int canMoveTetramino(Tetramino tetraMino, int **field, UserAction_t key) {
   int **next = malloc_array(HEIGHT, WIDTH);
   int **tmp_next = malloc_array(HEIGHT, WIDTH);
@@ -50,14 +52,6 @@ int isHorizontalMoveOrRotate(UserAction_t userAction) {
   return res;
 }
 
-int isDownMove(UserAction_t userAction) {
-  int res = MY_OK;
-  if (userAction != Down) {
-    res = ERROR;
-  }
-  return res;
-}
-
 void moveTetramino(Tetramino *tetraMino, UserAction_t key) {
   // TODO уменьшить размер строк
 
@@ -90,10 +84,6 @@ void moveTetramino(Tetramino *tetraMino, UserAction_t key) {
 }
 
 void move_down_tetraMino(Tetramino *tetraMino) { tetraMino->center_y += 1; }
-
-void move_up_tetraMino(Tetramino *tetraMino) {
-  if (tetraMino->center_y >= HEIGHT - 1) tetraMino->center_y -= 1;
-}
 
 void rotate_TetraMino(Tetramino *tetraMino) {
   int rotate = (tetraMino->rotate + 1) % 4;

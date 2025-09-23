@@ -4,9 +4,10 @@
  * @details
  *
  */
+#include "../../utils/defines.h"
+#include "../../utils/utilities.h"
 #include "../inc/tetramino_movement.h"
 #include "../inc/tetris.h"
-
 // typedef enum {
 //     Start,
 //     Pause,
@@ -31,7 +32,7 @@ TetrisData_t init_empty_data(void) {
   data.is_active = true;
   data.is_win = false;
   data.changed = false;
-  data.current_action = NONE_ACTION;
+  data.current_action = (UserAction_t)NONE_ACTION;
   data.current_state = STATE_INITIALIZE;
   // data.prev_state = data.current_state;
   data.shift_timer = init_shift_timer();
@@ -40,58 +41,58 @@ TetrisData_t init_empty_data(void) {
   return data;
 }
 
-const char *stateToString(Tetris_state_t s) {
-  switch (s) {
-    case STATE_INITIALIZE:
-      return "start    ";
-    case STATE_SPAWN:
-      return "spawn    ";
-    case STATE_MOVEMENT:
-      return "movement ";
-    // case STATE_ATTACH:
-    //     return "attaching";
-    case STATE_SHIFT:
-      return "shift    ";
-    case STATE_PAUSE:
-      return "pause    ";
-    case STATE_GAME_OVER:
-      return "game_over";
-    case STATE_EXIT:
-      return "exit     ";
-    // case STATE_MAIN_MENU:
-    //   return "main_menu";
-    default:
-      return "unknown  ";
-  }
-}
-
-const char *actionToString(UserAction_t s) {
-  switch (s) {
-    case Start:
-      return "start      ";
-      break;
-    case Pause:
-      return "pause      ";
-      break;
-    case Terminate:
-      return "terminate  ";
-      break;
-    case Left:
-      return "left       ";
-      break;
-    case Right:
-      return "right      ";
-      break;
-    case Up:
-      return "up         ";
-      break;
-    case Down:
-      return "down       ";
-    case Action:
-      return "action     ";
-  }
-  return "none_action";
-}
+// const char *stateToString(Tetris_state_t s) {
+//   switch (s) {
+//     case STATE_INITIALIZE:
+//       return "start    ";
+//     case STATE_SPAWN:
+//       return "spawn    ";
+//     case STATE_MOVEMENT:
+//       return "movement ";
+//     // case STATE_ATTACH:
+//     //     return "attaching";
+//     case STATE_SHIFT:
+//       return "shift    ";
+//     case STATE_PAUSE:
+//       return "pause    ";
+//     case STATE_GAME_OVER:
+//       return "game_over";
+//     case STATE_EXIT:
+//       return "exit     ";
+//     // case STATE_MAIN_MENU:
+//     //   return "main_menu";
+//     default:
+//       return "unknown  ";
+//   }
+// }
+//
+// const char *actionToString(UserAction_t s) {
+//   switch (s) {
+//     case Start:
+//       return "start      ";
+//       break;
+//     case Pause:
+//       return "pause      ";
+//       break;
+//     case Terminate:
+//       return "terminate  ";
+//       break;
+//     case Left:
+//       return "left       ";
+//       break;
+//     case Right:
+//       return "right      ";
+//       break;
+//     case Up:
+//       return "up         ";
+//       break;
+//     case Down:
+//       return "down       ";
+//     case Action:
+//       return "action     ";
+//   }
+//   return "none_action";
+// }
 
 void userInput(UserAction_t action, bool hold) {
   TetrisData_t *data = get_data();
@@ -123,6 +124,7 @@ void main_fsm(TetrisData_t *data, UserAction_t action) {
   if (state == STATE_INITIALIZE) {
     if (action == Terminate) {
       finish_game(data);
+      state = STATE_EXIT;
     } else if (action == Start) {
       state = STATE_SPAWN;
     }
@@ -134,6 +136,7 @@ void main_fsm(TetrisData_t *data, UserAction_t action) {
   } else if (state == STATE_MOVEMENT && !game_info->pause) {
     if (action == Terminate) {
       finish_game(data);
+      state = STATE_EXIT;
     } else {
       int shift = MY_OK;
       if (isHorizontalMoveOrRotate(action) == MY_OK) {
@@ -161,6 +164,7 @@ void main_fsm(TetrisData_t *data, UserAction_t action) {
       state = STATE_MOVEMENT;  // возвращаемся к движению
     } else if (action == Terminate) {
       finish_game(data);
+      state = STATE_EXIT;
     }
 
   } else if (state == STATE_GAME_OVER) {
@@ -169,6 +173,7 @@ void main_fsm(TetrisData_t *data, UserAction_t action) {
       state = STATE_SPAWN;  // начинаем новую игру
     } else if (action == Terminate) {
       finish_game(data);  // окончательный выход
+      state = STATE_EXIT;
     }
   }
 
@@ -179,7 +184,7 @@ void main_fsm(TetrisData_t *data, UserAction_t action) {
     data->changed = true;
   }
 
-  data->current_state = state;
+  data->current_state = (Tetris_state_t)state;
 }
 
 void attach_tetramino(TetrisData_t *data) {

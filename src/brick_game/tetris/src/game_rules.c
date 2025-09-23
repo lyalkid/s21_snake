@@ -7,6 +7,8 @@
 
 #include <math.h>
 
+#include "../../utils/defines.h"
+#include "../../utils/utilities.h"
 #include "../inc/tetris.h"
 int calc_score(int lines) {
   int res = 0;

@@ -7,6 +7,9 @@
 
 #ifndef TETRAMINO_MOVEMENT_H
 #define TETRAMINO_MOVEMENT_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "tetris.h"
 
 /**
@@ -36,7 +39,6 @@ int is_rotate_possible(Tetramino tetraMino, int rotate);
 // Аналогично для:
 void moveTetramino(Tetramino *tetraMino, UserAction_t key);
 void move_down_tetraMino(Tetramino *tetraMino);
-void move_up_tetraMino(Tetramino *tetraMino);
 void rotate_TetraMino(Tetramino *tetraMino);
 /**
  * @brief Проверяет, является ли действие движением.
@@ -45,12 +47,8 @@ void rotate_TetraMino(Tetramino *tetraMino);
  * @return 1 если да, иначе 0.
  */
 int isHorizontalMoveOrRotate(UserAction_t userAction);
-/**
- * @brief Проверяет, является ли действие движением вниз.
- *
- * @param userAction Действие.
- * @return 1 если нет, 0 если Down.
- */
-int isDownMove(UserAction_t userAction);
 
+#ifdef __cplusplus
+}
+#endif
 #endif  // TETRAMINO_MOVEMENT_H

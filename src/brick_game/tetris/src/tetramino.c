@@ -5,11 +5,9 @@
  *
  */
 
+#include "../../utils/defines.h"
+#include "../../utils/utilities.h"
 #include "../inc/tetris.h"
-
-void print_tetramino(Tetramino tetramino) {
-  printf("centr_x:%d\ncentr_y:%d\n", tetramino.center_x, tetramino.center_y);
-}
 
 Tetramino init_empty_tetraMino() {
   Tetramino tetraMino = {0};
@@ -29,29 +27,6 @@ Tetramino init_empty_tetraMino() {
   init_randomizer(&tetraMino.r);
   return tetraMino;
 }
-
-// Tetramino *get_tetramino_instance() {
-//   static Tetramino *t;
-//   if (t == NULL) {
-//     t = malloc(sizeof(Tetramino));
-//     // *t = init_empty_tetraMino();
-//
-//     t->type = 0;
-//     t->next_type = 1;
-//
-//     t->rotate = 0;
-//     t->center_x = 0;
-//     t->center_y = 0;
-//     for (int i = 0; i < 8; i++) {
-//       t->coordinates[i] = 0;
-//     }
-//
-//     t->tmp_current_figure_on_field = malloc_array(HEIGHT, WIDTH);
-//
-//     init_randomizer(&t->r);
-//   }
-//   return t;
-// }
 
 void placeTetraminoInArray(Tetramino tetraMino, int **next) {
   for (int i = 0; i < HEIGHT; i++) {

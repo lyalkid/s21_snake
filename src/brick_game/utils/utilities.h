@@ -12,7 +12,7 @@ extern "C" {
 #endif
 #include <stdio.h>
 #include <stdlib.h>
-void out(int **field);
+
  /**
  * @brief Выделяет память под 2D-массив.
  *
@@ -81,9 +81,6 @@ int get_real_len_of_number(const int a[], int size);
  *   1 0 0 1 ...
  *   --------------------
  */
-void print_array(int **array);
-
-void overlay_array(int **field, int **next, int max_x, int min_x);
 /**
  * @brief Возвращает минимальное из двух чисел.
  *

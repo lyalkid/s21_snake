@@ -3,6 +3,7 @@
 
 extern "C" {
 #include "../../brick_game/tetris/inc/tetris.h"
+#include "../../brick_game/utils/defines.h"
 }
 
 #include <QCloseEvent>

@@ -8,11 +8,7 @@
 #include "utilities.h"
 
 #include "../tetris/inc/tetris.h"
-void out(int **field) {
-  printf("------------\n");
-  print_array(field);
-  printf("------------\n");
-}
+
 int **malloc_array(int rows, int cols) {
   int **field = (int **)malloc(sizeof(int *) * rows);
   for (int i = 0; i < rows; i++) {
@@ -69,58 +65,6 @@ int get_real_len_of_number(const int a[], int size) {
   }
 
   return size - count;
-}
-
-void print_array(int **array) {
-  for (int i = 0; i < HEIGHT; i++) {
-    for (int j = 0; j < WIDTH; j++) {
-      if (array[i][j] == 3) {
-        printf("%c ", '+');
-      } else if (array[i][j] == 2) {
-        printf("%c ", 'o');
-      } else if (array[i][j] == 1) {
-        printf("%c ", '@');
-      } else {
-        printf("  ");
-      }
-    }
-    printf("\n");
-  }
-  printf("\n");
-}
-
-void overlay_array(int **field, int **next, int max_x, int min_x) {
-  for (int j = 0; j < WIDTH; j++) {
-    printf("%d ", j);
-  }
-  printf("\n");
-  for (int i = 0; i < WIDTH; i++) {
-    if (i <= max_x && i >= min_x) {
-      printf("##");
-    } else {
-      printf("--");
-    }
-  }
-  printf("\n");
-  for (int i = 0; i < HEIGHT; i++) {
-    for (int j = 0; j < WIDTH; j++) {
-      int res = field[i][j] + next[i][j];
-      if (res != 0)
-        // printf("%d ", res);
-        printf("##");
-      else
-        printf("  ");
-    }
-    printf("| %d\n", i);
-  }
-  for (int i = 0; i < WIDTH; i++) {
-    if (i <= max_x && i >= min_x) {
-      printf("##");
-    } else {
-      printf("--");
-    }
-  }
-  printf("\n");
 }
 
 int findIndex(const int array[], int size, int i) {

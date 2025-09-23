@@ -8,15 +8,13 @@
 #include "../../../brick_game/snake/model/Snake.h"
 
 extern "C" {
-#include "../cli.h"
-#include "../tetris/frontend.h"
 #include "../../../brick_game/brick_game.h"
 #include "../../../brick_game/utils/timer.h"
+#include "../cli.h"
+#include "../tetris/frontend.h"
 }
 
 using namespace s21;
-
-
 
 void debug_info_snake(UserAction_t action, Vec2 dir, Vec2 head, bool shift,
                       Vec2 body[], int score, int speed) {

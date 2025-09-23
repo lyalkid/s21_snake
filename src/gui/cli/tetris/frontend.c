@@ -8,6 +8,7 @@
 #include "frontend.h"
 
 #include "../../../brick_game/tetris/inc/tetris.h"
+#include "../../../brick_game/utils/defines.h"
 #include "../cli.h"
 void draw(TetrisData_t *data, Game_wins_t *t_wins) {
   Tetris_state_t c_state = data->current_state;
