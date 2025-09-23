@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11 -Ibrick_game/tetris/inc -Ibrick_game/utils
+CFLAGS = -Wall -Wextra -Werror
 AR = ar
 ARFLAGS = rcs
 
@@ -28,12 +28,12 @@ uninstall: clean
 
 cli: tetris_cli snake_cli
 tetris_cli: $(T_CLI) $(T_LIB)
-	gcc gui/cli/tetris/main_tetris.c -L. libtetris.a libtcli.a -lncurses -lm -o build/t_cli
+	gcc $(CFLAGS)  gui/cli/tetris/main_tetris.c -L. libtetris.a libtcli.a -lncurses -lm -o build/t_cli
 
 snake_cli:
-	g++ gui/cli/snake/main.cpp  $(SNAKE_SRC) -L. libtetris.a libtcli.a -lncurses -o build/s_cli
+	g++ $(CFLAGS) gui/cli/snake/main.cpp  $(SNAKE_SRC) -L. libtetris.a libtcli.a -lncurses -o build/s_cli
 main:
-	gcc gui/cli/main_cli.c -L. libtcli.a -lncurses -o build/cli
+	gcc $(CFLAGS) gui/cli/main_cli.c -L. libtcli.a -lncurses -o build/cli
 desktop:
 	mkdir tmp
 	cd tmp && qmake ../gui/desktop/ && make
@@ -57,14 +57,14 @@ dist: all
 	mv BRICKGAME-2.0.tar.gz dist
 
 test:
-	g++ $(SNAKE_SRC)  $(TETRIS_SRC) $(T_CLI_SRC) -lncurses  tests/test_snake_controller.cpp  -lgtest -lgtest_main  -lrt -lm -o test
+	g++ $(CFLAGS) $(SNAKE_SRC)  $(TETRIS_SRC)  -lncurses  tests/test_snake_controller.cpp  -lgtest -lgtest_main  -lrt -lm -o test
 	chmod +x ./test
 	./test
 	rm test
 
 gcov_report:
 	mkdir $(GCOV_FOLDER)
-	g++ tests/test_snake_controller.cpp $(SNAKE_SRC) $(TETRIS_SRC) --coverage -lgtest -lgtest_main -lrt -lm -o $(GCOV_FOLDER)/gcov_test
+	g++ $(CFLAGS) tests/test_snake_controller.cpp $(SNAKE_SRC) $(TETRIS_SRC) --coverage -lgtest -lgtest_main -lrt -lm -o $(GCOV_FOLDER)/gcov_test
 	chmod +x $(GCOV_FOLDER)/gcov_test
 	$(GCOV_FOLDER)/gcov_test
 	lcov -t "gcov_test" -o gcov_test.info --no-external --ignore-errors mismatch -c -d .

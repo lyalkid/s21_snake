@@ -28,7 +28,7 @@ TetrisData_t *get_data(void) {
 }
 
 TetrisData_t init_empty_data(void) {
-  TetrisData_t data = {0};
+  TetrisData_t data = {};
   data.is_active = true;
   data.is_win = false;
   data.changed = false;

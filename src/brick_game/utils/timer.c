@@ -21,7 +21,7 @@ void countTime(Shift_timer* timer) {
 }
 
 Shift_timer init_shift_timer() {
-  Shift_timer timer = {0};
+  Shift_timer timer = {};
   get_time(&timer.before);
   get_time(&timer.after);
   timer.delay_to_shift = TIME;

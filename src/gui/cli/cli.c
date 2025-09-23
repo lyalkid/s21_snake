@@ -145,7 +145,7 @@ void init_menu(Game_wins_t* t_wins) {
   // refresh();
   box(game_win, 0, 0);
   box(next_win, 0, 0);
-  box(info_win, 0, 0);
+  // box(info_win, 0, 0);
   wrefresh(game_win);
   wrefresh(next_win);
   wrefresh(info_win);

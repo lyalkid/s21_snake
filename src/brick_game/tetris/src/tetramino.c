@@ -10,7 +10,7 @@
 #include "../inc/tetris.h"
 
 Tetramino init_empty_tetraMino() {
-  Tetramino tetraMino = {0};
+  Tetramino tetraMino = {};
   tetraMino.type = 0;
 
   tetraMino.next_type = 1;
