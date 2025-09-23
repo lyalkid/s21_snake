@@ -22,7 +22,7 @@ all:
 
 
 main:
-	gcc main_cli.c -L. libtcli.a -lncurses -o build/cli
+	gcc gui/cli/main_cli.c -L. libtcli.a -lncurses -o build/cli
 
 install: cli desktop
 

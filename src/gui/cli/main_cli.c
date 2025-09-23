@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "gui/cli/cli.h"
+#include "cli.h"
 
 void start_game(int choice) {
   endwin();  // завершили текущую ncurses-сессию
