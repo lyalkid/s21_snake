@@ -1,15 +1,11 @@
 #include <QApplication>
-#include <QWidget>
-#include <QPainter>
+
+#include "../../brick_game/tetris/inc/tetris.h"
 #include "mainwindow.h"
 
-
-
-
 int main(int argc, char *argv[]) {
-    QApplication app(argc, argv);
-    GameWidget w;
-    w.show();
-    return app.exec();
+  QApplication a(argc, argv);
+  MainWindow w;
+  w.show();
+  return a.exec();
 }
-
