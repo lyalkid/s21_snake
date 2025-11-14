@@ -10,7 +10,7 @@ cd build
 ./desktop # start desktop version, using Qt6
 ```
 ## Demonstration of project
-![video example](readme/demo.webm)
+![video example](readme/demo.mp4)
 
 ## Project Requirements
 ### Part 1. Main task
