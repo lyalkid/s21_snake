@@ -10,7 +10,7 @@ cd build
 ./desktop # start desktop version, using Qt6
 ```
 ## Demonstration of project
-![video example](readme/demo.mp4)
+
 https://github.com/user-attachments/assets/0038ecc1-0248-4c40-a3a4-87867f2db837
 
 ## Project Requirements
